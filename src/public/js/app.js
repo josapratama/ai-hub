@@ -37,8 +37,14 @@ function switchTab(tab) {
 
   if (tab === "overview" && typeof loadStats === "function") loadStats();
   if (tab === "keys" && typeof loadKeys === "function") loadKeys();
-  if (tab === "providers" && typeof loadProviders === "function") loadProviders();
-  if (tab === "playground" && typeof loadPromptPresets === "function") loadPromptPresets();
+  if (tab === "providers" && typeof loadProviders === "function") {
+    loadProviders();
+    if (typeof loadAliases === "function") loadAliases();
+  }
+  if (tab === "playground") {
+    if (typeof loadPromptPresets === "function") loadPromptPresets();
+    if (typeof updatePlaygroundCostEstimate === "function") updatePlaygroundCostEstimate();
+  }
 }
 
 function toggleMobileMenu() {

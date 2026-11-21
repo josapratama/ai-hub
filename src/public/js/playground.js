@@ -372,3 +372,39 @@ async function runPlayground() {
     }
   }
 }
+
+function updatePlaygroundCostEstimate() {
+  const prompt = document.getElementById("pgPrompt")?.value || "";
+  const system = document.getElementById("pgSystem")?.value || "";
+  const totalChars = (prompt + " " + system).trim().length;
+  const estTokens = Math.max(Math.ceil(totalChars / 3.8), totalChars > 0 ? 1 : 0);
+  const container = document.getElementById("pgCostEstimatorGrid");
+  const countEl = document.getElementById("pgEstTokenCount");
+
+  if (countEl) countEl.textContent = `${estTokens.toLocaleString()} tokens (~${totalChars} chars)`;
+  if (!container) return;
+
+  const comparison = [
+    { name: "Gemini 2.0 Flash", cost: (estTokens / 1_000_000) * 0.10, tag: "Best Value" },
+    { name: "DeepSeek Chat", cost: (estTokens / 1_000_000) * 0.14, tag: "Ultra Low Cost" },
+    { name: "Groq Llama 3.3", cost: (estTokens / 1_000_000) * 0.59, tag: "Fastest Sub-Second" },
+    { name: "GPT-4o Mini", cost: (estTokens / 1_000_000) * 0.15, tag: "OpenAI Efficient" },
+    { name: "Claude 3.5 Sonnet", cost: (estTokens / 1_000_000) * 3.00, tag: "Top Reasoning" },
+    { name: "GPT-4o", cost: (estTokens / 1_000_000) * 2.50, tag: "Flagship" },
+    { name: "Ollama (Local)", cost: 0, tag: "100% Free / Self-Hosted" }
+  ];
+
+  container.innerHTML = comparison.map(c => `
+    <div class="p-2 rounded-lg bg-surface-900/80 border border-surface-700/60 flex items-center justify-between text-xs">
+      <div>
+        <div class="font-bold text-white flex items-center gap-1.5">
+          <span>${c.name}</span>
+          <span class="text-[9px] px-1 py-0.2 rounded bg-surface-800 text-brand-300 font-sans">${c.tag}</span>
+        </div>
+      </div>
+      <div class="font-mono font-bold ${c.cost === 0 ? 'text-emerald-400' : 'text-amber-300'}">
+        ${c.cost === 0 ? 'FREE' : `$${c.cost.toFixed(6)}`}
+      </div>
+    </div>
+  `).join("");
+}

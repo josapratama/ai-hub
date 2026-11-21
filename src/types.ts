@@ -89,6 +89,9 @@ export interface ApiKey {
   rateLimitRpm: number;
   maxMonthlyTokens?: number; // Quota cap (e.g. 1_000_000)
   maxMonthlyCostUsd?: number; // Financial cost budget limit (e.g. $5.00)
+  currentMonthTokens?: number; // Tokens consumed in current billing month
+  currentMonthCostUsd?: number; // USD spent in current billing month
+  lastResetMonth?: string; // Format "YYYY-MM" (e.g. "2026-11")
   enforceProvider?: ProviderId;
   totalCostUsd: number;
   isActive: boolean;

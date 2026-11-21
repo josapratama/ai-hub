@@ -31,10 +31,12 @@ async function loadKeys() {
     }
 
     tbody.innerHTML = keys.map(k => {
-      const quota = k.maxMonthlyTokens ? `${k.totalTokens.toLocaleString()} / ${k.maxMonthlyTokens.toLocaleString()}` : `${k.totalTokens.toLocaleString()}`;
+      const currentMonthTokens = k.currentMonthTokens !== undefined ? k.currentMonthTokens : k.totalTokens;
+      const currentMonthCost = k.currentMonthCostUsd !== undefined ? k.currentMonthCostUsd : k.totalCostUsd;
+      const quota = k.maxMonthlyTokens ? `${currentMonthTokens.toLocaleString()} / ${k.maxMonthlyTokens.toLocaleString()}` : `${currentMonthTokens.toLocaleString()}`;
       const expBadge = k.expiresAt ? `<div class="text-[10px] text-amber-400 font-mono">Exp: ${new Date(k.expiresAt).toLocaleDateString()}</div>` : '';
       const ipsBadge = k.allowedIps && k.allowedIps.length > 0 ? `<div class="text-[10px] text-purple-300 font-mono">IP: ${k.allowedIps.join(", ")}</div>` : '';
-      const budgetBadge = k.maxMonthlyCostUsd ? `<div class="text-[10px] text-emerald-400 font-mono font-semibold">Budget: $${(k.totalCostUsd || 0).toFixed(2)} / $${k.maxMonthlyCostUsd.toFixed(2)}</div>` : '';
+      const budgetBadge = k.maxMonthlyCostUsd ? `<div class="text-[10px] text-emerald-400 font-mono font-semibold">Bulan Ini: $${(currentMonthCost || 0).toFixed(2)} / $${k.maxMonthlyCostUsd.toFixed(2)}</div>` : '';
       const providerBadge = k.enforceProvider ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-950 text-purple-300 border border-purple-800 ml-1.5">🔒 ${k.enforceProvider}</span>` : '';
 
       return `
@@ -61,16 +63,21 @@ async function loadKeys() {
           </td>
           <td class="py-3 px-3.5 font-mono text-gray-300 text-xs">${k.totalRequests.toLocaleString()}</td>
           <td class="py-3 px-3.5 font-mono text-amber-300 text-xs">${quota}</td>
-          <td class="py-3 px-3.5 font-mono text-emerald-400 font-bold text-xs">$${(k.totalCostUsd || 0).toFixed(4)}</td>
+          <td class="py-3 px-3.5 font-mono text-emerald-400 font-bold text-xs">$${(currentMonthCost || 0).toFixed(4)}</td>
           <td class="py-3 px-3.5">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${k.isActive ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-red-950 text-red-300 border border-red-800'}">
               ${k.isActive ? 'Active' : 'Disabled'}
             </span>
           </td>
           <td class="py-3 px-3.5 text-right">
-            <button onclick="deleteKey('${k.id}')" class="text-red-400 hover:text-red-300 p-1.5 rounded hover:bg-red-950/40 transition-colors" title="Delete Key">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
+            <div class="flex items-center justify-end gap-1">
+              <button onclick="resetKeyUsage('${k.id}', '${k.name}')" class="text-amber-400 hover:text-amber-300 p-1.5 rounded hover:bg-amber-950/40 transition-colors" title="Reset Monthly Usage to 0">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteKey('${k.id}')" class="text-red-400 hover:text-red-300 p-1.5 rounded hover:bg-red-950/40 transition-colors" title="Delete Key">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -272,4 +279,20 @@ curl -X POST ${host}/v1/audio/transcriptions \\
 function copySnippetCode() {
   const code = document.getElementById("snippetCodeBlock")?.textContent || "";
   copyToClipboard(code, "Integration code snippet copied!");
+}
+
+async function resetKeyUsage(id, name) {
+  if (!confirm(`Reset kuota pemakaian bulanan untuk '${name}' ke 0?`)) return;
+  try {
+    const res = await fetchApi(`/api/keys/${id}/reset`, { method: "POST" });
+    const data = await res.json();
+    if (data.success) {
+      showToast(data.message, "success");
+      loadKeys();
+    } else {
+      showToast(data.error || "Gagal mereset kuota", "error");
+    }
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }

@@ -183,6 +183,27 @@
         </div>
       </div>
 
+      <!-- Server Telemetry & VPS Runtime Health -->
+      <div class="px-5 py-3 rounded-2xl glass-panel flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border border-surface-700/60 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400">Node & Platform:</span>
+            <span id="sysPlatform" class="font-mono font-bold text-white">Memuat...</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400">RAM:</span>
+            <span id="sysMemory" class="font-mono text-cyan-300 font-bold">Memuat...</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400">Uptime:</span>
+            <span id="sysUptime" class="font-mono text-emerald-400 font-bold">Memuat...</span>
+          </div>
+        </div>
+      </div>
+
       <!-- 7-Day Visual Analytics Trend Chart -->
       <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-4">
         <div class="flex items-center justify-between">
@@ -810,6 +831,45 @@
           </div>
         </div>
       </div>
+
+      <!-- Visual Custom Model Alias Manager Card -->
+      <div class="p-6 rounded-2xl glass-panel shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-surface-700/60">
+          <div>
+            <h4 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="shuffle" class="w-4 h-4 text-brand-400"></i>
+              <span>Visual Model Aliases & Virtual Names</span>
+            </h4>
+            <p class="text-xs text-gray-400 mt-0.5">Petakan nama model virtual kustom yang diminta aplikasi klien ke model AI sebenarnya.</p>
+          </div>
+          <button onclick="loadAliases()" class="text-xs text-brand-400 hover:text-white flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+          </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-2.5">
+          <input id="newAliasName" type="text" placeholder="Alias (misal: my-agent-brain)" class="w-full sm:w-1/3 glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+          <input id="newAliasTarget" type="text" placeholder="Target Model (misal: deepseek-chat atau gpt-4o)" class="w-full sm:w-1/2 glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+          <button onclick="addCustomAlias()" class="w-full sm:w-auto px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Alias
+          </button>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-surface-700/60">
+          <table class="w-full text-left text-xs">
+            <thead class="text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
+              <tr>
+                <th class="py-2.5 px-3">Virtual Alias</th>
+                <th class="py-2.5 px-3">Target Model Aktual</th>
+                <th class="py-2.5 px-3 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="aliasesTableBody" class="divide-y divide-surface-700/40 bg-surface-900/40">
+              <tr><td colspan="3" class="py-4 text-center text-gray-500">Memuat alias...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- ========================================== -->
@@ -873,7 +933,7 @@
                 <select id="pgPresetSelect" onchange="applyPresetToPlayground(this.value)" class="glass-input px-2 py-0.5 rounded-lg text-xs text-white"></select>
               </div>
             </div>
-            <textarea id="pgSystem" rows="2" placeholder="e.g. You are a senior principal engineer..." class="w-full glass-input p-3 rounded-xl text-xs text-white font-mono resize-y"></textarea>
+            <textarea id="pgSystem" rows="2" oninput="updatePlaygroundCostEstimate()" placeholder="e.g. You are a senior principal engineer..." class="w-full glass-input p-3 rounded-xl text-xs text-white font-mono resize-y"></textarea>
           </div>
 
           <!-- Prompt Box & Attachment Preview -->
@@ -887,7 +947,21 @@
               </button>
             </div>
 
-            <textarea id="pgPrompt" rows="3" placeholder="Type your query or prompt here..." class="w-full glass-input p-3 rounded-xl text-xs text-white font-mono resize-y"></textarea>
+            <textarea id="pgPrompt" rows="3" oninput="updatePlaygroundCostEstimate()" placeholder="Type your query or prompt here..." class="w-full glass-input p-3 rounded-xl text-xs text-white font-mono resize-y"></textarea>
+          </div>
+
+          <!-- Live Token & Cost Simulator Collapsible -->
+          <div class="p-3.5 rounded-xl bg-surface-900/60 border border-surface-700/60 space-y-2.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-gray-300 flex items-center gap-1.5">
+                <i data-lucide="calculator" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Live Multi-Provider Cost Simulator</span>
+              </span>
+              <span id="pgEstTokenCount" class="font-mono font-bold text-amber-300">0 tokens</span>
+            </div>
+            <div id="pgCostEstimatorGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <!-- Rendered dynamically by playground.js -->
+            </div>
           </div>
 
           <!-- Action Bar: Media Attachments & Submit -->

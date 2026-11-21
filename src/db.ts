@@ -440,12 +440,31 @@ class Database extends EventEmitter {
   public recordKeyUsage(keyId: string, tokens: number, costUsd: number = 0) {
     const key = this.store.apiKeys.find(k => k.id === keyId);
     if (key) {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      if (key.lastResetMonth !== currentMonth) {
+        key.currentMonthTokens = 0;
+        key.currentMonthCostUsd = 0;
+        key.lastResetMonth = currentMonth;
+      }
       key.totalRequests += 1;
       key.totalTokens += tokens;
       key.totalCostUsd = Number(((key.totalCostUsd || 0) + costUsd).toFixed(6));
+      key.currentMonthTokens = (key.currentMonthTokens || 0) + tokens;
+      key.currentMonthCostUsd = Number(((key.currentMonthCostUsd || 0) + costUsd).toFixed(6));
       key.lastUsedAt = new Date().toISOString();
       this.save();
     }
+  }
+
+  public resetKeyUsage(keyId: string): ApiKey | null {
+    const key = this.store.apiKeys.find(k => k.id === keyId);
+    if (!key) return null;
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    key.currentMonthTokens = 0;
+    key.currentMonthCostUsd = 0;
+    key.lastResetMonth = currentMonth;
+    this.save();
+    return key;
   }
 
   // --- Logging Methods ---

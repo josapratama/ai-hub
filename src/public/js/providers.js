@@ -60,6 +60,7 @@ async function loadProviders() {
       const ca = document.getElementById("cfgCustomAliases");
       if (ca && settings.customAliases) ca.value = JSON.stringify(settings.customAliases, null, 2);
     }
+    loadAliases();
   } catch (err) {
     console.error("Failed to load providers:", err);
   }
@@ -258,4 +259,97 @@ async function restoreBackup(event) {
     }
   };
   reader.readAsText(file);
+}
+
+async function loadAliases() {
+  try {
+    const res = await fetchApi("/api/aliases");
+    if (!res.ok) return;
+    const data = await res.json();
+    const tbody = document.getElementById("aliasesTableBody");
+    if (!tbody) return;
+
+    const custom = Object.entries(data.customAliases || {});
+    const system = Object.entries(data.systemAliases || {});
+
+    if (custom.length === 0 && system.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Belum ada alias model.</td></tr>`;
+      return;
+    }
+
+    let rows = "";
+    custom.forEach(([alias, target]) => {
+      rows += `
+        <tr class="border-b border-surface-700/40 hover:bg-surface-800/40 text-xs">
+          <td class="py-2 px-3 font-mono font-bold text-brand-300">${alias}</td>
+          <td class="py-2 px-3 font-mono text-gray-200">➔ ${target}</td>
+          <td class="py-2 px-3 text-right">
+            <button onclick="deleteCustomAlias('${alias}')" class="text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-950/40" title="Hapus Alias">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    system.forEach(([alias, target]) => {
+      rows += `
+        <tr class="border-b border-surface-700/20 text-xs text-gray-400">
+          <td class="py-2 px-3 font-mono text-gray-400">${alias} <span class="text-[9px] px-1 py-0.5 bg-surface-800 rounded font-sans">system</span></td>
+          <td class="py-2 px-3 font-mono text-gray-400">➔ ${target}</td>
+          <td class="py-2 px-3 text-right text-[10px] italic text-gray-500">Bawaan</td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = rows;
+    if (window.lucide) window.lucide.createIcons();
+  } catch {}
+}
+
+async function addCustomAlias() {
+  const aliasInput = document.getElementById("newAliasName");
+  const targetInput = document.getElementById("newAliasTarget");
+  if (!aliasInput || !targetInput) return;
+
+  const alias = aliasInput.value.trim().toLowerCase();
+  const targetModel = targetInput.value.trim();
+
+  if (!alias || !targetModel) {
+    showToast("Nama Alias dan Target Model wajib diisi!", "warning");
+    return;
+  }
+
+  try {
+    const res = await fetchApi("/api/aliases", {
+      method: "POST",
+      body: { alias, targetModel }
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Alias '${alias}' berhasil dipetakan ke '${targetModel}'!`, "success");
+      aliasInput.value = "";
+      loadAliases();
+    } else {
+      showToast(data.error || "Gagal menambah alias", "error");
+    }
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function deleteCustomAlias(alias) {
+  if (!confirm(`Hapus alias '${alias}'?`)) return;
+  try {
+    const res = await fetchApi(`/api/aliases/${encodeURIComponent(alias)}`, {
+      method: "DELETE"
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Alias '${alias}' berhasil dihapus`, "info");
+      loadAliases();
+    }
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }

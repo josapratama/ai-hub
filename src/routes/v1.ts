@@ -119,11 +119,20 @@ v1Router.use((req: Request, res: Response, next) => {
     });
   }
 
+  // Monthly quota calculation with automatic cycle tracking
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const monthlyTokens = (apiKey.lastResetMonth === currentMonth && apiKey.currentMonthTokens !== undefined)
+    ? apiKey.currentMonthTokens
+    : (apiKey.currentMonthTokens ?? apiKey.totalTokens);
+  const monthlyCost = (apiKey.lastResetMonth === currentMonth && apiKey.currentMonthCostUsd !== undefined)
+    ? apiKey.currentMonthCostUsd
+    : (apiKey.currentMonthCostUsd ?? apiKey.totalCostUsd);
+
   // Check Token Quota Limit
-  if (apiKey.maxMonthlyTokens && apiKey.totalTokens >= apiKey.maxMonthlyTokens) {
+  if (apiKey.maxMonthlyTokens && monthlyTokens >= apiKey.maxMonthlyTokens) {
     return res.status(429).json({
       error: {
-        message: `Monthly token quota exceeded. Quota is ${apiKey.maxMonthlyTokens.toLocaleString()} tokens (used: ${apiKey.totalTokens.toLocaleString()}).`,
+        message: `Monthly token quota exceeded for ${currentMonth}. Quota is ${apiKey.maxMonthlyTokens.toLocaleString()} tokens (used: ${monthlyTokens.toLocaleString()}).`,
         type: "insufficient_quota",
         param: null,
         code: "monthly_quota_exceeded",
@@ -132,10 +141,10 @@ v1Router.use((req: Request, res: Response, next) => {
   }
 
   // Check Financial Cost Budget Limit (USD)
-  if (apiKey.maxMonthlyCostUsd && apiKey.totalCostUsd >= apiKey.maxMonthlyCostUsd) {
+  if (apiKey.maxMonthlyCostUsd && monthlyCost >= apiKey.maxMonthlyCostUsd) {
     return res.status(429).json({
       error: {
-        message: `Monthly cost budget exceeded. Limit is $${apiKey.maxMonthlyCostUsd.toFixed(2)} (spent: $${apiKey.totalCostUsd.toFixed(2)}). Contact administrator to raise budget.`,
+        message: `Monthly cost budget exceeded for ${currentMonth}. Limit is $${apiKey.maxMonthlyCostUsd.toFixed(2)} (spent: $${monthlyCost.toFixed(2)}). Contact administrator to raise budget.`,
         type: "insufficient_quota",
         param: null,
         code: "monthly_budget_exceeded",
@@ -144,17 +153,17 @@ v1Router.use((req: Request, res: Response, next) => {
   }
 
   // Warning when reaching 90% quota or budget
-  if (apiKey.maxMonthlyTokens && apiKey.totalTokens >= apiKey.maxMonthlyTokens * 0.9) {
+  if (apiKey.maxMonthlyTokens && monthlyTokens >= apiKey.maxMonthlyTokens * 0.9) {
     sendWebhookAlert(
       "Quota Warning (90% Reached)",
-      `Client '${apiKey.project}' has consumed ${apiKey.totalTokens.toLocaleString()} of its ${apiKey.maxMonthlyTokens.toLocaleString()} monthly token quota.`,
+      `Client '${apiKey.project}' has consumed ${monthlyTokens.toLocaleString()} of its ${apiKey.maxMonthlyTokens.toLocaleString()} monthly token quota.`,
       "warning"
     );
   }
-  if (apiKey.maxMonthlyCostUsd && apiKey.totalCostUsd >= apiKey.maxMonthlyCostUsd * 0.9) {
+  if (apiKey.maxMonthlyCostUsd && monthlyCost >= apiKey.maxMonthlyCostUsd * 0.9) {
     sendWebhookAlert(
       "Budget Warning (90% Reached)",
-      `Client '${apiKey.project}' has spent $${apiKey.totalCostUsd.toFixed(2)} of its $${apiKey.maxMonthlyCostUsd.toFixed(2)} monthly USD budget limit.`,
+      `Client '${apiKey.project}' has spent $${monthlyCost.toFixed(2)} of its $${apiKey.maxMonthlyCostUsd.toFixed(2)} monthly USD budget limit.`,
       "warning"
     );
   }
@@ -335,20 +344,33 @@ v1Router.post("/chat/completions", async (req: Request, res: Response) => {
         res.setHeader("X-AIHub-Fallback", "true");
       }
 
+      let isClientDisconnected = false;
+      const onClientClose = () => {
+        isClientDisconnected = true;
+      };
+      req.on("close", onClientClose);
+
       try {
         for await (const chunk of result.stream) {
+          if (isClientDisconnected || req.destroyed || !res.writable) {
+            break;
+          }
           res.write(chunk);
         }
-        res.end();
+        if (!isClientDisconnected && res.writable) {
+          res.end();
+        }
         return;
       } catch (streamErr: any) {
         console.error("[AI Hub Streaming Transmission Error]:", streamErr);
-        if (res.headersSent) {
+        if (!isClientDisconnected && res.headersSent && res.writable) {
           res.write(`data: ${JSON.stringify({ error: { message: streamErr.message || "Streaming interrupted" } })}\n\n`);
           res.end();
           return;
         }
         throw streamErr;
+      } finally {
+        req.off("close", onClientClose);
       }
     }
 

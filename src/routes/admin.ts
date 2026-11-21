@@ -115,6 +115,16 @@ adminRouter.patch("/keys/:id", (req: Request, res: Response) => {
   res.json(updated);
 });
 
+// POST /api/keys/:id/reset - Reset monthly usage counter
+adminRouter.post("/keys/:id/reset", (req: Request, res: Response) => {
+  const { id } = req.params;
+  const reset = db.resetKeyUsage(id);
+  if (!reset) {
+    return res.status(404).json({ error: "API key not found." });
+  }
+  res.json({ success: true, message: `Kuota bulanan untuk '${reset.name}' berhasil di-reset ke 0.`, key: reset });
+});
+
 // DELETE /api/keys/:id
 adminRouter.delete("/keys/:id", (req: Request, res: Response) => {
   const { id } = req.params;
@@ -627,6 +637,30 @@ adminRouter.post("/aliases", (req: Request, res: Response) => {
   customAliases[cleanAlias] = cleanTarget;
   db.updateSettings({ customAliases });
   res.json({ success: true, customAliases });
+});
+
+// GET /api/system/health - Realtime System & VPS Telemetry
+adminRouter.get("/system/health", (_req: Request, res: Response) => {
+  const mem = process.memoryUsage();
+  const uptimeSeconds = Math.floor(process.uptime());
+  const hours = Math.floor(uptimeSeconds / 3600);
+  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+
+  res.json({
+    status: "ok",
+    nodeVersion: process.version,
+    platform: `${process.platform} (${process.arch})`,
+    uptime: `${hours}h ${minutes}m ${uptimeSeconds % 60}s`,
+    uptimeSeconds,
+    memory: {
+      rssMb: Number((mem.rss / 1024 / 1024).toFixed(1)),
+      heapUsedMb: Number((mem.heapUsed / 1024 / 1024).toFixed(1)),
+      heapTotalMb: Number((mem.heapTotal / 1024 / 1024).toFixed(1)),
+    },
+    activeKeys: db.listApiKeys().length,
+    activeLogsCount: db.listLogs(1000).length,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // DELETE /api/aliases/:alias - Delete custom model alias

@@ -52,6 +52,9 @@ async function loadStats() {
       renderAnalyticsChart(s.dailyHistory);
     }
 
+    // Load System Telemetry
+    loadSystemHealth();
+
     // Also load recent logs
     if (typeof loadLogs === "function") {
       loadLogs();
@@ -59,6 +62,20 @@ async function loadStats() {
   } catch (err) {
     console.error("Failed to load overview stats:", err);
   }
+}
+
+async function loadSystemHealth() {
+  try {
+    const res = await fetchApi("/api/system/health");
+    if (!res.ok) return;
+    const data = await res.json();
+    const elUptime = document.getElementById("sysUptime");
+    const elMem = document.getElementById("sysMemory");
+    const elPlatform = document.getElementById("sysPlatform");
+    if (elUptime) elUptime.textContent = data.uptime;
+    if (elMem) elMem.textContent = `${data.memory.rssMb} MB RSS (${data.memory.heapUsedMb} MB Heap)`;
+    if (elPlatform) elPlatform.textContent = `${data.platform} • Node ${data.nodeVersion}`;
+  } catch {}
 }
 
 function renderAnalyticsChart(dailyHistory = []) {
