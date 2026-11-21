@@ -1,0 +1,36 @@
+{
+  "name": "ai-hub",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Centralized AI Gateway, Multi-Provider Router & Token Analytics",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc && node -e \"const fs = require('fs'); fs.cpSync('src/public', 'dist/public', { recursive: true });\"",
+    "start": "node dist/server.js"
+  },
+  "keywords": [
+    "ai-gateway",
+    "llm-router",
+    "openai-proxy",
+    "gemini",
+    "ollama",
+    "nexus-chat"
+  ],
+  "author": "Josa Pratama",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
