@@ -4,7 +4,7 @@ let currentTab = "overview";
 
 function switchTab(tab) {
   currentTab = tab;
-  const tabs = ["overview", "keys", "providers", "playground", "docs"];
+  const tabs = ["overview", "agents", "keys", "providers", "playground", "docs"];
 
   tabs.forEach(t => {
     const view = document.getElementById(`view-${t}`);
@@ -36,6 +36,7 @@ function switchTab(tab) {
   if (window.lucide) window.lucide.createIcons();
 
   if (tab === "overview" && typeof loadStats === "function") loadStats();
+  if (tab === "agents" && typeof initAgentsTab === "function") initAgentsTab();
   if (tab === "keys" && typeof loadKeys === "function") loadKeys();
   if (tab === "providers" && typeof loadProviders === "function") {
     loadProviders();
@@ -62,6 +63,8 @@ function refreshAll() {
   if (typeof loadKeys === "function") loadKeys();
   if (typeof loadProviders === "function") loadProviders();
   if (typeof loadPromptPresets === "function") loadPromptPresets();
+  if (typeof loadAvailableScopes === "function") loadAvailableScopes();
+  if (typeof loadAgentAnalytics === "function") loadAgentAnalytics();
   showToast("Dashboard metrics refreshed", "info", 1800);
 }
 

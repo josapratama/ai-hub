@@ -5,6 +5,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { v1Router } from "./routes/v1.js";
 import { adminRouter } from "./routes/admin.js";
+import { agentsRouter } from "./routes/agents.js";
+import { mcpRouter } from "./routes/mcp.js";
+import { webhooksRouter } from "./routes/webhooks.js";
+import { cronEngine } from "./agents/services/cron.js";
 import { db } from "./db.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,6 +59,30 @@ app.get("/health/providers", (_req, res) => {
 // OpenAI-compatible v1 router (used by nexus-chat, resumecraft, python, curl, etc.)
 app.use("/v1", v1Router);
 
+// Autonomous Agents & Tool Orchestration API
+app.use("/api/agents", agentsRouter);
+
+// Backward-compatible endpoints for embedded widgets
+app.post("/api/chat", (req, res, next) => {
+  req.url = "/chat";
+  agentsRouter(req, res, next);
+});
+app.get("/api/projects", (req, res, next) => {
+  req.url = "/projects";
+  agentsRouter(req, res, next);
+});
+app.get("/api/projects/:id", (req, res, next) => {
+  req.url = `/projects/${req.params.id}`;
+  agentsRouter(req, res, next);
+});
+
+// Standard Model Context Protocol (MCP) JSON-RPC endpoints
+app.use("/api/mcp", mcpRouter);
+app.use("/mcp", mcpRouter);
+
+// Inbound Messaging & IoT Webhooks (WhatsApp, Telegram, EdgeSentinel CCTV)
+app.use("/api/webhooks", webhooksRouter);
+
 // Admin management API
 app.use("/api", adminRouter);
 
@@ -78,6 +106,9 @@ const server = app.listen(port, () => {
     console.log(`  • [${k.project.padEnd(12)}] ${k.key}`);
   }
   console.log("==================================================================");
+
+  // Start autonomous background cron patrol engine
+  cronEngine.start();
 });
 
 server.on("error", (err: any) => {
@@ -92,6 +123,7 @@ server.on("error", (err: any) => {
 // Graceful Shutdown
 const shutdown = (signal: string) => {
   console.log(`\n[AI Hub] Received ${signal}. Flushing database and shutting down cleanly...`);
+  cronEngine.stop();
   db.save();
   server.close(() => {
     console.log("[AI Hub] Gateway stopped gracefully. Goodbye!");
