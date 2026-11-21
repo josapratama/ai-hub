@@ -34,6 +34,12 @@ async function fetchApi(url, options = {}) {
   return fetch(url, { ...options, headers });
 }
 
+async function apiRequest(endpoint, method = "GET", body = null) {
+  const options = { method };
+  if (body) options.body = body;
+  return fetchApi(endpoint, options);
+}
+
 function formatToastMessage(msg) {
   if (typeof msg !== "string") return String(msg);
   
@@ -107,3 +113,12 @@ function copyToClipboard(text, successMsg = "Copied to clipboard!") {
     showToast("Failed to copy", "error");
   });
 }
+
+// Global window exposure
+window.fetchApi = fetchApi;
+window.apiRequest = apiRequest;
+window.showToast = showToast;
+window.getAdminToken = getAdminToken;
+window.saveAdminToken = saveAdminToken;
+window.copyToClipboard = copyToClipboard;
+
