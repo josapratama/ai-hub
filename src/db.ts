@@ -82,7 +82,7 @@ function getDefaultStore(): DatabaseStore {
         apiKey: process.env.GEMINI_API_KEY || "",
         isEnabled: true,
         isAvailable: Boolean(process.env.GEMINI_API_KEY),
-        models: ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"],
+        models: ["gemini-3-flash-preview", "gemini-2.5-pro", "gemini-2.5-flash"],
       },
       openai: {
         id: "openai",
@@ -220,7 +220,7 @@ function getDefaultStore(): DatabaseStore {
       },
     ],
     settings: {
-      defaultModel: process.env.DEFAULT_MODEL || "gemini-2.0-flash",
+      defaultModel: process.env.DEFAULT_MODEL || "gemini-3-flash-preview",
       fallbackModel: process.env.FALLBACK_MODEL || "gpt-4o-mini",
       adminToken: process.env.ADMIN_TOKEN || "aih_admin_secret_2026",
     },
@@ -254,6 +254,19 @@ class Database extends EventEmitter {
           if (!data.providerConfigs[k]) {
             data.providerConfigs[k] = v;
           }
+        }
+        // Auto-upgrade deprecated Gemini models in existing store.json
+        if (data.providerConfigs.gemini) {
+          if (
+            !data.providerConfigs.gemini.models ||
+            data.providerConfigs.gemini.models.includes("gemini-2.0-flash") ||
+            data.providerConfigs.gemini.models.includes("gemini-1.5-flash")
+          ) {
+            data.providerConfigs.gemini.models = ["gemini-3-flash-preview", "gemini-2.5-pro", "gemini-2.5-flash"];
+          }
+        }
+        if (data.settings && (data.settings.defaultModel === "gemini-2.0-flash" || data.settings.defaultModel === "gemini-1.5-flash")) {
+          data.settings.defaultModel = "gemini-3-flash-preview";
         }
         if (!data.promptPresets || data.promptPresets.length === 0) {
           data.promptPresets = def.promptPresets;

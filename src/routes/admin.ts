@@ -420,7 +420,7 @@ adminRouter.post("/providers/:id/test", async (req: Request, res: Response) => {
     if (id === "gemini") {
       if (!effectiveKey) throw new Error("Gemini API key is not configured.");
       const res = await callGemini(effectiveKey, {
-        model: "gemini-2.0-flash",
+        model: "gemini-3-flash-preview",
         messages: [{ role: "user", content: "Ping! Reply with just 'PONG'." }],
         max_tokens: 10,
       });
@@ -586,7 +586,7 @@ adminRouter.post("/playground", async (req: Request, res: Response) => {
   try {
     const result = await executeChatCompletion(
       {
-        model: model || "gemini-2.0-flash",
+        model: model || "gemini-3-flash-preview",
         messages,
         temperature: temperature !== undefined ? Number(temperature) : 0.7,
       },

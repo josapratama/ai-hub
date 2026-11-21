@@ -198,7 +198,7 @@ client = OpenAI(
 
 # Call any model (Gemini, Claude, GPT, OpenRouter, DeepSeek, Llama)
 response = client.chat.completions.create(
-    model="gemini-2.0-flash", # or 'openrouter/auto', 'gpt-4o', 'claude-3-5-sonnet', 'auto'
+    model="gemini-3-flash-preview", # or 'openrouter/auto', 'gpt-4o', 'claude-3-5-sonnet', 'auto'
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Hello from ${activeSnippetProject}!"}
@@ -217,7 +217,7 @@ const client = new OpenAI({
 
 async function main() {
   const completion = await client.chat.completions.create({
-    model: "gemini-2.0-flash",
+    model: "gemini-3-flash-preview",
     messages: [
       { role: "user", content: "Hello from ${activeSnippetProject}!" }
     ],
@@ -241,7 +241,7 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = await streamText({
-    model: aiHub("gemini-2.0-flash"), // or 'auto'
+    model: aiHub("gemini-3-flash-preview"), // or 'auto'
     messages,
   });
 
@@ -252,7 +252,7 @@ export async function POST(req: Request) {
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer ${activeSnippetKey}" \\
   -d '{
-    "model": "gemini-2.0-flash",
+    "model": "gemini-3-flash-preview",
     "messages": [{"role": "user", "content": "Ping AI Hub!"}],
     "temperature": 0.7
   }'`;

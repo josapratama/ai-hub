@@ -131,7 +131,7 @@ export const cctvTools: Record<string, AgentTool> = {
               const arrayBuffer = await imgRes.arrayBuffer();
               const base64Data = Buffer.from(arrayBuffer).toString("base64");
               const res = await callGemini(providers.gemini.apiKey, {
-                model: "gemini-2.0-flash",
+                model: "gemini-3-flash-preview",
                 messages: [
                   {
                     role: "user",

@@ -62,7 +62,7 @@ export async function transcribeAudio(params: {
     else mimeType = "audio/mp3";
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${gemKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${gemKey}`;
 
   const payload = {
     contents: [
