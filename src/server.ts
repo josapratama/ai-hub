@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { v1Router } from "./routes/v1.js";
 import { adminRouter } from "./routes/admin.js";
@@ -24,7 +25,33 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
 // Static frontend dashboard files
 const publicDir = path.resolve(__dirname, "public");
-app.use(express.static(publicDir));
+app.use(express.static(publicDir, { index: false }));
+
+let cachedDashboardHtml: string | null = null;
+
+function renderDashboardHtml(): string {
+  if (process.env.NODE_ENV === "production" && cachedDashboardHtml) {
+    return cachedDashboardHtml;
+  }
+
+  const templatePath = path.join(publicDir, "index.html");
+  if (!fs.existsSync(templatePath)) return "AI Hub Dashboard template not found";
+
+  let html = fs.readFileSync(templatePath, "utf-8");
+  html = html.replace(/<!--#include\s+file=["'](.+?)["']\s*-->/g, (_match, relPath) => {
+    const compPath = path.join(publicDir, relPath);
+    if (fs.existsSync(compPath)) {
+      return fs.readFileSync(compPath, "utf-8");
+    }
+    return `<!-- Component ${relPath} not found -->`;
+  });
+
+  if (process.env.NODE_ENV === "production") {
+    cachedDashboardHtml = html;
+  }
+
+  return html;
+}
 
 // Healthcheck
 app.get("/health", (_req, res) => {
@@ -86,9 +113,18 @@ app.use("/api/webhooks", webhooksRouter);
 // Admin management API
 app.use("/api", adminRouter);
 
-// Fallback: serve dashboard SPA
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+// Fallback: serve modular dashboard SPA
+app.get("/", (_req, res) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(renderDashboardHtml());
+});
+
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api") || req.path.startsWith("/v1") || req.path.includes(".")) {
+    return next();
+  }
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(renderDashboardHtml());
 });
 
 // Start Server

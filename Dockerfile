@@ -9,6 +9,7 @@ RUN pnpm install
 
 COPY tsconfig.json ./
 COPY src ./src
+COPY scripts ./scripts
 
 RUN pnpm run build
 

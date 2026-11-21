@@ -1,0 +1,237 @@
+<!-- VIEW 1: OVERVIEW & REALTIME ANALYTICS -->
+<div id="view-overview" class="space-y-6">
+  
+  <!-- Metrics Cards Grid -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
+      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total Requests</div>
+      <div id="statTotalRequests" class="text-xl sm:text-2xl font-black text-white">0</div>
+    </div>
+    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
+      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total Tokens</div>
+      <div id="statTotalTokens" class="text-xl sm:text-2xl font-black text-amber-400">0</div>
+    </div>
+    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
+      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Est. Cost (USD)</div>
+      <div id="statTotalCost" class="text-xl sm:text-2xl font-black text-emerald-400">$0.0000</div>
+    </div>
+    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
+      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Success Rate</div>
+      <div id="statSuccessRate" class="text-xl sm:text-2xl font-black text-blue-400">100%</div>
+    </div>
+    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
+      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Active Keys</div>
+      <div id="statActiveKeys" class="text-xl sm:text-2xl font-black text-purple-400">0</div>
+    </div>
+    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
+      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Avg Latency</div>
+      <div id="statAvgLatency" class="text-xl sm:text-2xl font-black text-cyan-400">0ms</div>
+    </div>
+  </div>
+
+  <!-- Server Telemetry & VPS Runtime Health -->
+  <div class="px-5 py-3 rounded-2xl glass-panel flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border border-surface-700/60 shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-400">Node & Platform:</span>
+        <span id="sysPlatform" class="font-mono font-bold text-white">Memuat...</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2">
+        <span class="text-gray-400">RAM:</span>
+        <span id="sysMemory" class="font-mono text-cyan-300 font-bold">Memuat...</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-400">Uptime:</span>
+        <span id="sysUptime" class="font-mono text-emerald-400 font-bold">Memuat...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7-Day Visual Analytics Trend Chart -->
+  <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+        <span>Daily Traffic & Token Consumption (7 Hari Terakhir)</span>
+      </h3>
+      <span class="text-[11px] text-gray-400">Statistik real-time tren harian</span>
+    </div>
+    <div id="analyticsChartContainer" class="w-full h-40 flex items-end gap-2 pt-4 pb-2 border-b border-surface-700/60">
+      <div class="w-full text-center py-6 text-gray-500 text-xs">Memuat visualisasi statistik 7 hari...</div>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-gray-400">
+      <div class="flex items-center gap-4">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-brand-500 inline-block"></span> Total Requests</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-400 inline-block"></span> Token Consumption</span>
+      </div>
+      <span id="chartTotalSummary" class="text-xs text-gray-300">Menghitung akumulasi transaksi...</span>
+    </div>
+  </div>
+
+  <!-- Traffic Distribution by Provider -->
+  <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-3 border border-surface-700/60">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+        <i data-lucide="pie-chart" class="w-4 h-4 text-brand-400"></i>
+        <span>Live Provider Traffic Distribution</span>
+      </h3>
+      <span class="text-[11px] text-gray-400">Auto-balanced multi-provider telemetry</span>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-2">
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-blue-400">Gemini</span>
+          <span id="lbl-gemini" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-gemini" class="bg-blue-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-emerald-400">OpenAI</span>
+          <span id="lbl-openai" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-openai" class="bg-emerald-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-amber-400">Anthropic</span>
+          <span id="lbl-anthropic" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-anthropic" class="bg-amber-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-indigo-400">OpenRouter</span>
+          <span id="lbl-openrouter" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-openrouter" class="bg-indigo-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-orange-400">Mistral</span>
+          <span id="lbl-mistral" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-mistral" class="bg-orange-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-cyan-400">Groq Cloud</span>
+          <span id="lbl-groq" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-groq" class="bg-cyan-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-purple-400">DeepSeek</span>
+          <span id="lbl-deepseek" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-deepseek" class="bg-purple-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-stone-300">xAI (Grok)</span>
+          <span id="lbl-xai" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-xai" class="bg-stone-400 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-teal-400">Cohere</span>
+          <span id="lbl-cohere" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-cohere" class="bg-teal-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-emerald-400">Perplexity</span>
+          <span id="lbl-perplexity" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-perplexity" class="bg-emerald-400 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-rose-400">Ollama Local</span>
+          <span id="lbl-ollama" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-ollama" class="bg-rose-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[11px] font-semibold mb-1">
+          <span class="text-fuchsia-400">Audio / Speech</span>
+          <span id="lbl-audio" class="text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-audio" class="bg-fuchsia-500 h-1.5 rounded-full" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Realtime Request Logs Table -->
+  <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="list" class="w-4 h-4 text-brand-400"></i>
+          <span>Realtime Request Logs</span>
+        </h3>
+        <button onclick="toggleLiveLogStream()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-900 text-xs text-gray-300 border border-surface-700 hover:text-white transition-all">
+          <span id="liveDot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+          <span id="liveText" class="text-[11px] font-semibold">Live Stream (Off)</span>
+        </button>
+      </div>
+
+      <!-- Log Filters -->
+      <div class="flex items-center flex-wrap gap-2">
+        <input id="searchLogs" type="text" placeholder="Search prompt, model..." oninput="filterAndRenderLogs()"
+          class="glass-input px-3 py-1.5 rounded-xl text-xs text-white placeholder-gray-500 w-36 sm:w-48 font-mono" />
+        <select id="filterProject" onchange="filterAndRenderLogs()" class="glass-input px-2.5 py-1.5 rounded-xl text-xs text-white">
+          <option value="ALL">All Projects</option>
+        </select>
+        <select id="filterStatus" onchange="filterAndRenderLogs()" class="glass-input px-2.5 py-1.5 rounded-xl text-xs text-white">
+          <option value="ALL">All Status</option>
+          <option value="success">Success (200)</option>
+          <option value="error">Error / Budget Exceeded</option>
+        </select>
+        <button onclick="downloadLogsCsv()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Export CSV">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>CSV</span>
+        </button>
+        <button onclick="downloadLogsJson()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Export JSON">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+          <span>JSON</span>
+        </button>
+        <button onclick="clearAllLogs()" class="text-xs bg-rose-600/80 hover:bg-rose-600 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Clear all logs">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          <span>Clear</span>
+        </button>
+        <button onclick="loadLogs()" class="text-xs bg-surface-700 hover:bg-surface-600 text-gray-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border border-surface-700/60">
+      <table class="w-full text-left text-xs">
+        <thead class="text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
+          <tr>
+            <th class="py-3 px-3.5">Time</th>
+            <th class="py-3 px-3.5">Project</th>
+            <th class="py-3 px-3.5">Model Requested</th>
+            <th class="py-3 px-3.5">Provider Used</th>
+            <th class="py-3 px-3.5">Tokens</th>
+            <th class="py-3 px-3.5">Est. Cost</th>
+            <th class="py-3 px-3.5">Latency</th>
+            <th class="py-3 px-3.5">Status</th>
+          </tr>
+        </thead>
+        <tbody id="logsTableBody" class="divide-y divide-surface-700/40 bg-surface-900/40">
+          <tr><td colspan="8" class="py-8 text-center text-gray-500">Loading requests...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

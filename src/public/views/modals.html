@@ -1,0 +1,58 @@
+<!-- MODALS ARCHITECTURE -->
+
+<!-- MODAL 1: REQUEST LOG INSPECTOR -->
+<div id="logModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+  <div class="bg-surface-800 border border-surface-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+    <div class="flex items-center justify-between border-b border-surface-700 pb-3">
+      <h3 class="text-sm font-bold text-white flex items-center gap-2">
+        <i data-lucide="file-search" class="w-4 h-4 text-brand-400"></i>
+        <span>Request Inspection Details</span>
+      </h3>
+      <button onclick="closeLogModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-surface-700">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div id="logModalContent" class="space-y-4 overflow-y-auto pr-1 select-text"></div>
+    <div class="pt-2 border-t border-surface-700 flex justify-end">
+      <button onclick="closeLogModal()" class="px-4 py-2 rounded-xl bg-surface-700 hover:bg-surface-600 text-white text-xs font-semibold transition-colors">
+        Close Inspector
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: CODE SNIPPET INTEGRATION -->
+<div id="snippetModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+  <div class="bg-surface-800 border border-surface-700 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div class="p-4 border-b border-surface-700 flex items-center justify-between">
+      <h4 class="text-sm font-bold text-white flex items-center gap-2">
+        <i data-lucide="code" class="w-4 h-4 text-brand-400"></i>
+        <span>Instant Code Snippets & SDK Setup</span>
+      </h4>
+      <button onclick="closeSnippetModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-surface-700">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Snippet Language Tabs -->
+    <div class="bg-surface-900 border-b border-surface-700/80 px-4 py-2 flex items-center gap-1.5 overflow-x-auto">
+      <button onclick="switchSnippetTab('python')" id="snipTab-python" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-brand-600 text-white shadow-sm">Python</button>
+      <button onclick="switchSnippetTab('nodejs')" id="snipTab-nodejs" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">Node.js</button>
+      <button onclick="switchSnippetTab('nextjs')" id="snipTab-nextjs" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">Next.js (AI SDK)</button>
+      <button onclick="switchSnippetTab('curl')" id="snipTab-curl" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">cURL</button>
+      <button onclick="switchSnippetTab('image')" id="snipTab-image" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">Image API</button>
+      <button onclick="switchSnippetTab('audio')" id="snipTab-audio" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-white">Audio STT</button>
+    </div>
+
+    <div class="p-5 overflow-y-auto space-y-3">
+      <div class="flex items-center justify-between">
+        <span id="snippetTargetProject" class="text-xs text-brand-300 font-mono"></span>
+        <button onclick="copySnippetCode()" class="text-xs bg-surface-700 hover:bg-surface-600 text-brand-300 font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          <span>Copy Snippet</span>
+        </button>
+      </div>
+      <pre id="snippetCodeBlock" class="p-4 bg-surface-900 rounded-xl border border-surface-700 text-gray-200 text-xs font-mono overflow-x-auto whitespace-pre leading-relaxed select-text"></pre>
+    </div>
+  </div>
+</div>

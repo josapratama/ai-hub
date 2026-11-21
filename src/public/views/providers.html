@@ -1,0 +1,401 @@
+<!-- VIEW 3: PROVIDERS & ROUTING CONFIGURATION -->
+<div id="view-providers" class="space-y-6 hidden">
+  
+  <!-- Diagnostic Benchmark Section -->
+  <div class="p-6 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="gauge" class="w-4 h-4 text-emerald-400"></i>
+          <span>Live Provider Diagnostic & Benchmark Matrix</span>
+        </h3>
+        <p class="text-xs text-gray-400 mt-0.5">Uji latensi riil, ketersediaan koneksi upstream, dan model aktif secara komprehensif.</p>
+      </div>
+      <button id="btnBenchmark" onclick="runProviderBenchmark()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/20">
+        <i data-lucide="activity" class="w-4 h-4"></i>
+        <span>Run Health Benchmark</span>
+      </button>
+    </div>
+
+    <div id="benchmarkResultsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-1">
+      <div class="p-4 rounded-xl bg-surface-900/60 border border-surface-700/60 text-center text-gray-500 text-xs col-span-full">
+        Klik "Run Health Benchmark" untuk menjalankan diagnostic ping ke seluruh provider AI yang terkonfigurasi.
+      </div>
+    </div>
+  </div>
+
+  <!-- Providers Cards Grid (12 Providers) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    
+    <!-- Google Gemini Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold">✨</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Google Gemini</h4>
+            <p class="text-[11px] text-gray-400">gemini-2.0-flash, gemini-1.5-pro</p>
+          </div>
+        </div>
+        <span id="badge-gemini" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-gemini" type="password" placeholder="AIzaSy..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('gemini')" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('gemini')" class="px-3 bg-surface-700 hover:bg-surface-600 text-brand-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5" title="Test Live Connection">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- OpenAI Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold">🟢</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">OpenAI Official</h4>
+            <p class="text-[11px] text-gray-400">gpt-4o, gpt-4o-mini, gpt-4-turbo</p>
+          </div>
+        </div>
+        <span id="badge-openai" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-openai" type="password" placeholder="sk-..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('openai')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('openai')" class="px-3 bg-surface-700 hover:bg-surface-600 text-emerald-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Anthropic Claude Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center font-bold">🧠</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Anthropic Claude</h4>
+            <p class="text-[11px] text-gray-400">claude-3-5-sonnet, claude-3-5-haiku</p>
+          </div>
+        </div>
+        <span id="badge-anthropic" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-anthropic" type="password" placeholder="sk-ant-..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('anthropic')" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('anthropic')" class="px-3 bg-surface-700 hover:bg-surface-600 text-amber-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- OpenRouter Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold">🌐</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">OpenRouter (Universal)</h4>
+            <p class="text-[11px] text-gray-400">Akses 300+ Model Dunia</p>
+          </div>
+        </div>
+        <span id="badge-openrouter" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-openrouter" type="password" placeholder="sk-or-v1-..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('openrouter')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('openrouter')" class="px-3 bg-surface-700 hover:bg-surface-600 text-indigo-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- DeepSeek Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold">🐋</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">DeepSeek Cloud</h4>
+            <p class="text-[11px] text-gray-400">deepseek-chat (V3), deepseek-reasoner (R1)</p>
+          </div>
+        </div>
+        <span id="badge-deepseek" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-deepseek" type="password" placeholder="sk-..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('deepseek')" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('deepseek')" class="px-3 bg-surface-700 hover:bg-surface-600 text-purple-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Groq Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-cyan-600/20 text-cyan-400 flex items-center justify-center font-bold">⚡</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Groq LPU (Ultra Fast)</h4>
+            <p class="text-[11px] text-gray-400">llama-3.3-70b-versatile, mixtral</p>
+          </div>
+        </div>
+        <span id="badge-groq" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-groq" type="password" placeholder="gsk_..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('groq')" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('groq')" class="px-3 bg-surface-700 hover:bg-surface-600 text-cyan-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Mistral Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-orange-600/20 text-orange-400 flex items-center justify-center font-bold">🌪️</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Mistral AI Cloud</h4>
+            <p class="text-[11px] text-gray-400">mistral-large, codestral, pixtral</p>
+          </div>
+        </div>
+        <span id="badge-mistral" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-mistral" type="password" placeholder="mst_..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('mistral')" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('mistral')" class="px-3 bg-surface-700 hover:bg-surface-600 text-orange-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Together AI Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold">🤝</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Together AI</h4>
+            <p class="text-[11px] text-gray-400">Qwen 2.5, DeepSeek R1, Llama 3</p>
+          </div>
+        </div>
+        <span id="badge-together" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-together" type="password" placeholder="together_..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('together')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('together')" class="px-3 bg-surface-700 hover:bg-surface-600 text-indigo-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- xAI Grok Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-stone-600/20 text-stone-300 flex items-center justify-center font-bold">✖️</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">xAI (Grok)</h4>
+            <p class="text-[11px] text-gray-400">grok-2-1212, grok-2-vision-1212</p>
+          </div>
+        </div>
+        <span id="badge-xai" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-xai" type="password" placeholder="xai-..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('xai')" class="flex-1 bg-stone-600 hover:bg-stone-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('xai')" class="px-3 bg-surface-700 hover:bg-surface-600 text-stone-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Cohere Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-600/20 text-teal-400 flex items-center justify-center font-bold">💬</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Cohere AI</h4>
+            <p class="text-[11px] text-gray-400">command-r-plus, command-r</p>
+          </div>
+        </div>
+        <span id="badge-cohere" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-cohere" type="password" placeholder="cohere_..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('cohere')" class="flex-1 bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('cohere')" class="px-3 bg-surface-700 hover:bg-surface-600 text-teal-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Perplexity Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold">🔍</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Perplexity AI</h4>
+            <p class="text-[11px] text-gray-400">sonar, sonar-pro, sonar-reasoning</p>
+          </div>
+        </div>
+        <span id="badge-perplexity" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Not Configured</span>
+      </div>
+      <input id="provKey-perplexity" type="password" placeholder="pplx-..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveProvider('perplexity')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Key</button>
+        <button onclick="testProvider('perplexity')" class="px-3 bg-surface-700 hover:bg-surface-600 text-emerald-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Ollama Local Card -->
+    <div class="p-5 rounded-2xl glass-panel space-y-4 border border-surface-700/60">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-rose-600/20 text-rose-400 flex items-center justify-center font-bold">🦙</div>
+          <div>
+            <h4 class="text-sm font-bold text-white">Local Ollama</h4>
+            <p class="text-[11px] text-gray-400">Self-Hosted Local LLM Gateway</p>
+          </div>
+        </div>
+        <span id="badge-ollama" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-800 text-gray-400">Offline / Local</span>
+      </div>
+      <input id="provBaseUrl-ollama" type="text" value="http://localhost:11434" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div class="flex gap-2">
+        <button onclick="saveOllamaConfig()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs py-2 rounded-xl transition-all">Save Endpoint</button>
+        <button onclick="syncOllamaModels()" class="px-3 bg-surface-700 hover:bg-surface-600 text-rose-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5" title="Auto-discover models">
+          <i data-lucide="scan" class="w-3.5 h-3.5"></i> Sync Models
+        </button>
+        <button onclick="testProvider('ollama')" class="px-3 bg-surface-700 hover:bg-surface-600 text-rose-300 font-semibold text-xs py-2 rounded-xl transition-all flex items-center gap-1.5">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i> Test
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Routing & Failover Settings Card -->
+  <div class="p-6 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+    <div>
+      <h4 class="text-sm font-bold text-white flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4 text-brand-400"></i>
+        <span>Global Gateway Routing, Security & Failover Rules</span>
+      </h4>
+      <p class="text-xs text-gray-400 mt-0.5">Konfigurasi default model, failover otomatis saat upstream down, prompt injection guardrails, dan PII redaction.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-[11px] font-semibold text-gray-300 uppercase mb-1">Default Model (When unspecified)</label>
+        <input id="cfgDefaultModel" type="text" value="gemini-2.0-flash" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-gray-300 uppercase mb-1">Fallback Model (On primary provider failure)</label>
+        <input id="cfgFallbackModel" type="text" value="gpt-4o-mini" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-[11px] font-semibold text-gray-300 uppercase mb-1">Global System Instructions (Prepended to all requests)</label>
+      <textarea id="cfgSystemPrompt" rows="2" placeholder="e.g. You are a secure assistant..." class="w-full glass-input p-3 rounded-xl text-xs text-white font-mono resize-y"></textarea>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-[11px] font-semibold text-gray-300 uppercase mb-1">Webhook Alert URL (Discord / Slack / Telegram)</label>
+        <input id="cfgWebhookUrl" type="url" placeholder="https://discord.com/api/webhooks/..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      </div>
+      <div>
+        <label class="block text-[11px] font-semibold text-gray-300 uppercase mb-1">Custom Model Aliases (JSON Format)</label>
+        <textarea id="cfgCustomAliases" rows="2" placeholder='{"fast": "gemini-2.0-flash", "smart": "gpt-4o"}' class="w-full glass-input p-2.5 rounded-xl text-xs text-white font-mono resize-y"></textarea>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-6 pt-2">
+      <div class="flex items-center gap-2">
+        <input id="cfgEnableGuardrails" type="checkbox" class="w-4 h-4 rounded bg-surface-900 border-surface-700 text-brand-600 focus:ring-0" />
+        <label for="cfgEnableGuardrails" class="text-xs text-gray-300 font-semibold cursor-pointer">
+          Enable Safety Guardrails (Prompt Injection & Jailbreak Defense)
+        </label>
+      </div>
+      <div class="flex items-center gap-2">
+        <input id="cfgEnablePiiRedaction" type="checkbox" class="w-4 h-4 rounded bg-surface-900 border-surface-700 text-brand-600 focus:ring-0" />
+        <label for="cfgEnablePiiRedaction" class="text-xs text-purple-300 font-semibold cursor-pointer">
+          Enable PII Redaction (Credit Cards, Emails, NIK 16-digit)
+        </label>
+      </div>
+    </div>
+
+    <button onclick="saveSettings()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-md shadow-brand-500/20">
+      Save Routing Rules & Security Settings
+    </button>
+
+    <!-- Backup & Snapshot Box -->
+    <div class="pt-4 mt-3 border-t border-surface-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h5 class="text-xs font-bold text-white flex items-center gap-1.5">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-brand-400"></i>
+          <span>Configuration Snapshots & Backup</span>
+        </h5>
+        <p class="text-[11px] text-gray-400">Ekspor atau pulihkan seluruh virtual keys, quota, dan konfigurasi provider.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="downloadBackup()" class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-200 border border-surface-700/80 text-xs font-semibold flex items-center gap-1.5 transition-all">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Backup
+        </button>
+        <label class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-200 border border-surface-700/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i> Restore
+          <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden" />
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Custom Model Alias Manager Card -->
+  <div class="p-6 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+    <div class="flex items-center justify-between pb-2 border-b border-surface-700/60">
+      <div>
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="shuffle" class="w-4 h-4 text-brand-400"></i>
+          <span>Visual Model Aliases & Virtual Names</span>
+        </h4>
+        <p class="text-xs text-gray-400 mt-0.5">Petakan nama model virtual kustom yang diminta aplikasi klien ke model AI sebenarnya.</p>
+      </div>
+      <button onclick="loadAliases()" class="text-xs text-brand-400 hover:text-white flex items-center gap-1">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+      </button>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center gap-2.5">
+      <input id="newAliasName" type="text" placeholder="Alias (misal: my-agent-brain)" class="w-full sm:w-1/3 glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <input id="newAliasTarget" type="text" placeholder="Target Model (misal: deepseek-chat atau gpt-4o)" class="w-full sm:w-1/2 glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <button onclick="addCustomAlias()" class="w-full sm:w-auto px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 whitespace-nowrap">
+        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Alias
+      </button>
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border border-surface-700/60">
+      <table class="w-full text-left text-xs">
+        <thead class="text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
+          <tr>
+            <th class="py-2.5 px-3">Virtual Alias</th>
+            <th class="py-2.5 px-3">Target Model Aktual</th>
+            <th class="py-2.5 px-3 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="aliasesTableBody" class="divide-y divide-surface-700/40 bg-surface-900/40">
+          <tr><td colspan="3" class="py-4 text-center text-gray-500">Memuat alias...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
