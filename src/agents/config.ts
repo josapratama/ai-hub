@@ -5,5 +5,5 @@ export const agentConfig = {
   waNotifyPhone: process.env.WA_NOTIFY_PHONE || "6281234567890",
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || "",
   telegramChatId: process.env.TELEGRAM_CHAT_ID || "",
-  defaultAgentModel: process.env.DEFAULT_AGENT_MODEL || "gemini-2.0-flash",
+  defaultAgentModel: process.env.DEFAULT_AGENT_MODEL || "gemini-3-flash-preview",
 };

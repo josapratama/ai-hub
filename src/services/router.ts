@@ -23,8 +23,9 @@ export const MODEL_ALIASES: Record<string, string> = {
   "gpt-3.5-turbo": "gpt-4o-mini",
   "gpt-3.5": "gpt-4o-mini",
   "gpt-4": "gpt-4o",
-  "gemini-pro": "gemini-2.0-flash",
-  "gemini-1.5": "gemini-1.5-flash",
+  "gemini-pro": "gemini-3-flash-preview",
+  "gemini-2.0-flash": "gemini-3-flash-preview",
+  "gemini-1.5": "gemini-3-flash-preview",
   "claude-3-sonnet": "claude-3-5-sonnet-20241022",
   "claude-3-haiku": "claude-3-5-haiku-20241022",
 };
@@ -141,18 +142,18 @@ export async function executeChatCompletion(
   let targetModel = rawRequest.model || "";
 
   if (!rawModel || rawModel === "auto" || rawModel === "default") {
-    targetModel = settings.defaultModel || "gemini-2.0-flash";
+    targetModel = settings.defaultModel || "gemini-3-flash-preview";
   } else if (rawModel === "fastest") {
     if (providers.groq?.isEnabled && providers.groq?.isAvailable) {
       targetModel = "llama-3.3-70b-versatile";
     } else {
-      targetModel = "gemini-2.0-flash";
+      targetModel = "gemini-3-flash-preview";
     }
   } else if (rawModel === "cheapest") {
     if (providers.deepseek?.isEnabled && providers.deepseek?.isAvailable) {
       targetModel = "deepseek-chat";
     } else {
-      targetModel = "gemini-2.0-flash";
+      targetModel = "gemini-3-flash-preview";
     }
   } else if (rawModel === "smartest") {
     if (providers.openai?.isEnabled && providers.openai?.isAvailable) {
@@ -160,7 +161,7 @@ export async function executeChatCompletion(
     } else if (providers.anthropic?.isEnabled && providers.anthropic?.isAvailable) {
       targetModel = "claude-3-5-sonnet-20241022";
     } else {
-      targetModel = "gemini-1.5-pro";
+      targetModel = "gemini-2.5-pro";
     }
   } else if (settings.customAliases?.[rawModel]) {
     targetModel = settings.customAliases[rawModel];

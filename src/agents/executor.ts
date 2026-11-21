@@ -160,7 +160,7 @@ export async function executeAgentChat({
   }
 
   // Model selection
-  const targetModel = modelPreference || db.getSettings().defaultModel || "gemini-2.0-flash";
+  const targetModel = modelPreference || db.getSettings().defaultModel || "gemini-3-flash-preview";
 
   // Build tools schema catalog for the prompt
   const toolDefinitions = Object.entries(scope.tools).map(([name, t]) => {

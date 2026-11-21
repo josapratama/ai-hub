@@ -79,7 +79,7 @@ async function uploadAudioPlayground(event) {
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("model", "gemini-2.0-flash");
+  formData.append("model", "gemini-3-flash-preview");
 
   try {
     const activeKey = getPlaygroundKey();

@@ -263,7 +263,7 @@ adminRouter.post("/providers/benchmark", async (_req: Request, res: Response) =>
 
         if (id === "gemini") {
           if (!effectiveKey) throw new Error("API key not configured");
-          testModel = "gemini-2.0-flash";
+          testModel = "gemini-3-flash-preview";
           const ping = await callGemini(effectiveKey, {
             model: testModel,
             messages: [{ role: "user", content: "Ping" }],

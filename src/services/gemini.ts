@@ -130,11 +130,30 @@ function applyResponseFormat(payload: any, responseFormat: any) {
   }
 }
 
+export function resolveGeminiModel(rawModel?: string): string {
+  if (!rawModel) return "gemini-3-flash-preview";
+  const clean = rawModel.replace(/^gemini\//, "").trim();
+  // Automatic modern model upgrade for deprecated models
+  if (
+    clean === "gemini-2.0-flash" ||
+    clean === "gemini-1.5-flash" ||
+    clean === "gemini-pro" ||
+    clean === "gemini-flash" ||
+    clean === "default"
+  ) {
+    return "gemini-3-flash-preview";
+  }
+  if (clean === "gemini-1.5-pro" || clean === "gemini-2.0-pro-exp-02-05") {
+    return "gemini-2.5-pro";
+  }
+  return clean;
+}
+
 export async function callGemini(
   apiKey: string,
   request: ChatCompletionRequest
 ): Promise<ChatCompletionResponse> {
-  const model = request.model.replace(/^gemini\//, "") || "gemini-2.0-flash";
+  const model = resolveGeminiModel(request.model);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   // Extract system prompt if present
@@ -230,7 +249,7 @@ export async function* streamGemini(
   apiKey: string,
   request: ChatCompletionRequest
 ): AsyncGenerator<{ chunk: string; text?: string; tokens?: { prompt: number; completion: number } }> {
-  const model = request.model.replace(/^gemini\//, "") || "gemini-2.0-flash";
+  const model = resolveGeminiModel(request.model);
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
 
   const systemMsg = request.messages.find(m => m.role === "system");

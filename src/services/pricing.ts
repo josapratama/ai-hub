@@ -1,5 +1,9 @@
 export const MODEL_PRICING: Record<string, { promptPer1M: number; completionPer1M: number }> = {
   // Google Gemini
+  "gemini-3-flash-preview": { promptPer1M: 0.10, completionPer1M: 0.40 },
+  "gemini-3.8-flash": { promptPer1M: 0.10, completionPer1M: 0.40 },
+  "gemini-2.5-flash": { promptPer1M: 0.10, completionPer1M: 0.40 },
+  "gemini-2.5-pro": { promptPer1M: 1.25, completionPer1M: 5.00 },
   "gemini-2.0-flash": { promptPer1M: 0.10, completionPer1M: 0.40 },
   "gemini-1.5-flash": { promptPer1M: 0.075, completionPer1M: 0.30 },
   "gemini-1.5-pro": { promptPer1M: 1.25, completionPer1M: 5.00 },

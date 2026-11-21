@@ -272,9 +272,15 @@ curl -X POST ${host}/v1/images/generations \\
 curl -X POST ${host}/v1/audio/transcriptions \\
   -H "Authorization: Bearer ${activeSnippetKey}" \\
   -F file=@recording.mp3 \\
-  -F model="gemini-2.0-flash"`;
+  -F model="gemini-3-flash-preview"`;
   }
 }
+
+window.addEventListener("languageChanged", () => {
+  if (typeof loadKeys === "function") {
+    loadKeys();
+  }
+});
 
 function copySnippetCode() {
   const code = document.getElementById("snippetCodeBlock")?.textContent || "";

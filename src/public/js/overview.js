@@ -49,6 +49,7 @@ async function loadStats() {
 
     // Render 7-day Visual Analytics Trend Chart
     if (s.dailyHistory) {
+      window._cachedDailyHistory = s.dailyHistory;
       renderAnalyticsChart(s.dailyHistory);
     }
 
@@ -83,8 +84,10 @@ function renderAnalyticsChart(dailyHistory = []) {
   const summaryEl = document.getElementById("chartTotalSummary");
   if (!container) return;
 
+  const t = window.t || ((k, fallback) => fallback || k);
+
   if (!dailyHistory || dailyHistory.length === 0) {
-    container.innerHTML = `<div class="w-full text-center py-8 text-gray-500 text-xs">Belum ada data transaksi dalam 7 hari terakhir.</div>`;
+    container.innerHTML = `<div class="w-full text-center py-6 text-gray-500 text-xs">${t("overview.no_logs", "Belum ada data transaksi dalam 7 hari terakhir.")}</div>`;
     return;
   }
 
@@ -94,24 +97,31 @@ function renderAnalyticsChart(dailyHistory = []) {
   const total7dCost = dailyHistory.reduce((acc, d) => acc + d.costUsd, 0);
 
   if (summaryEl) {
-    summaryEl.innerHTML = `Total 7 Hari: <span class="text-white font-bold">${total7dRequests.toLocaleString()} reqs</span> • <span class="text-amber-400 font-bold">${total7dTokens.toLocaleString()} tokens</span> • <span class="text-emerald-400 font-bold">$${total7dCost.toFixed(4)}</span>`;
+    summaryEl.innerHTML = `${t("overview.total_7d", "Total 7 Hari")}: <span class="text-white font-bold">${total7dRequests.toLocaleString()} reqs</span> • <span class="text-amber-400 font-bold">${total7dTokens.toLocaleString()} tokens</span> • <span class="text-emerald-400 font-bold">$${total7dCost.toFixed(4)}</span>`;
   }
 
   container.innerHTML = dailyHistory.map(d => {
     const pct = Math.max(Math.round((d.requests / maxRequests) * 100), d.requests > 0 ? 12 : 4);
     return `
-      <div class="flex-1 flex flex-col items-center gap-2 group relative">
+      <div class="flex-1 flex flex-col items-center gap-1.5 group relative min-w-0">
         <div class="absolute -top-12 bg-surface-900 border border-surface-700 text-white text-[10px] px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap shadow-xl">
           <div class="font-bold">${d.date} (${d.label})</div>
-          <div class="text-brand-300">${d.requests} requests • ${d.tokens.toLocaleString()} tokens</div>
+          <div class="text-brand-300">${d.requests} reqs • ${d.tokens.toLocaleString()} tokens</div>
           <div class="text-emerald-400">$${d.costUsd.toFixed(4)} USD</div>
         </div>
-        <div class="w-full bg-surface-800/80 rounded-t-lg h-32 flex items-end justify-center p-1 relative overflow-hidden">
+        <div class="w-full bg-surface-800/80 rounded-t-lg h-28 sm:h-32 flex items-end justify-center p-0.5 sm:p-1 relative overflow-hidden">
           <div class="w-full rounded-t-md bg-gradient-to-t from-brand-600 to-indigo-400 transition-all duration-500 shadow-md group-hover:from-brand-500 group-hover:to-cyan-400"
                style="height: ${pct}%;"></div>
         </div>
-        <span class="text-[10px] font-medium text-gray-400 group-hover:text-white transition-colors truncate w-full text-center">${d.label || d.date.slice(5)}</span>
+        <span class="text-[9px] sm:text-[10px] font-medium text-gray-400 group-hover:text-white transition-colors truncate w-full text-center">${d.label || d.date.slice(5)}</span>
       </div>
     `;
   }).join("");
 }
+
+// Re-render chart on language change
+window.addEventListener("languageChanged", () => {
+  if (window._cachedDailyHistory) {
+    renderAnalyticsChart(window._cachedDailyHistory);
+  }
+});

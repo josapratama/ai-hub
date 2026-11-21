@@ -453,7 +453,7 @@ v1Router.post("/audio/transcriptions", handleUpload("file"), async (req: Request
     });
   }
 
-  const model = req.body.model || "gemini-2.0-flash";
+  const model = req.body.model || "gemini-3-flash-preview";
   const startTime = Date.now();
 
   try {
@@ -468,7 +468,7 @@ v1Router.post("/audio/transcriptions", handleUpload("file"), async (req: Request
     const estPromptTokens = Math.ceil((file.size / 1024) * 4); // estimation based on audio size
     const estCompletionTokens = Math.ceil(result.text.length / 4);
     const totalTokens = estPromptTokens + estCompletionTokens;
-    const costUsd = calculateCost("gemini-2.0-flash", estPromptTokens, estCompletionTokens);
+    const costUsd = calculateCost("gemini-3-flash-preview", estPromptTokens, estCompletionTokens);
 
     db.addLog({
       apiKeyId: apiKey?.id,

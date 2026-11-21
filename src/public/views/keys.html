@@ -1,73 +1,98 @@
 <!-- VIEW 2: API KEYS, QUOTAS & BUDGETS -->
-<div id="view-keys" class="space-y-6 hidden">
+<div id="view-keys" class="space-y-5 sm:space-y-6 hidden w-full min-w-0">
   
   <!-- Create Key Form Card -->
-  <div class="p-6 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+  <div class="p-4 sm:p-6 rounded-xl sm:rounded-2xl glass-panel shadow-sm space-y-3.5 sm:space-y-4 border border-surface-700/60 w-full min-w-0">
     <div>
-      <h3 class="text-sm font-bold text-white flex items-center gap-2">
-        <i data-lucide="plus-circle" class="w-4 h-4 text-brand-400"></i>
-        <span>Generate Project Virtual API Key</span>
+      <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+        <i data-lucide="plus-circle" class="w-4 h-4 text-brand-400 shrink-0"></i>
+        <span data-i18n="keys.create_title">Buat Virtual API Key Baru</span>
       </h3>
-      <p class="text-xs text-gray-400 mt-0.5">Buat Bearer token virtual berkuota dengan batasan rate limit, batas anggaran USD bulanan, dan penguncian provider.</p>
+      <p data-i18n="keys.subtitle" class="text-[11px] sm:text-xs text-gray-400 mt-0.5 leading-relaxed">Terbitkan virtual key dengan kuota bulanan, pembatasan provider, dan limit USD ketat.</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-      <input id="newKeyName" type="text" placeholder="Key Label (e.g. Nexus Chat Prod)" class="glass-input px-3 py-2 rounded-xl text-xs text-white" />
-      <input id="newKeyProject" type="text" placeholder="Project ID (e.g. nexus-chat)" class="glass-input px-3 py-2 rounded-xl text-xs text-white" />
-      <input id="newKeyQuota" type="number" placeholder="Monthly Token Cap (e.g. 2000000)" class="glass-input px-3 py-2 rounded-xl text-xs text-white" />
-      <input id="newKeyBudget" type="number" step="0.01" placeholder="Max Budget USD (e.g. 10.00)" class="glass-input px-3 py-2 rounded-xl text-xs text-white" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 w-full">
+      <div>
+        <label data-i18n="keys.name_label" class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Nama Kunci / Label Project:</label>
+        <input id="newKeyName" type="text" data-i18n-placeholder="keys.name_placeholder" placeholder="Contoh: EdgeSentinel Production, Mobile App..." class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white" />
+      </div>
+      <div>
+        <label class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Project ID Slug:</label>
+        <input id="newKeyProject" type="text" placeholder="e.g. nexus-chat, cctv, iot" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white" />
+      </div>
+      <div>
+        <label data-i18n="keys.monthly_quota" class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Kuota Permintaan Bulanan:</label>
+        <input id="newKeyQuota" type="number" data-i18n-placeholder="keys.monthly_quota_placeholder" placeholder="0 = Tanpa Batas" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white" />
+      </div>
+      <div>
+        <label data-i18n="keys.monthly_cost_cap" class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Batas Pengeluaran Bulanan (USD):</label>
+        <input id="newKeyBudget" type="number" step="0.01" data-i18n-placeholder="keys.monthly_cost_placeholder" placeholder="Contoh: 10.00 (0 = Bebas)" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white" />
+      </div>
       
-      <select id="newKeyEnforceProvider" class="glass-input px-3 py-2 rounded-xl text-xs text-white">
-        <option value="">Provider Lock: None (Auto Routing)</option>
-        <option value="openrouter">🔒 Lock: OpenRouter (Universal)</option>
-        <option value="gemini">🔒 Lock: Google Gemini</option>
-        <option value="openai">🔒 Lock: OpenAI</option>
-        <option value="anthropic">🔒 Lock: Anthropic Claude</option>
-        <option value="mistral">🔒 Lock: Mistral AI</option>
-        <option value="together">🔒 Lock: Together AI</option>
-        <option value="xai">🔒 Lock: xAI Grok</option>
-        <option value="cohere">🔒 Lock: Cohere AI</option>
-        <option value="perplexity">🔒 Lock: Perplexity AI</option>
-        <option value="ollama">🔒 Lock: Local Ollama</option>
-        <option value="groq">🔒 Lock: Groq Llama</option>
-        <option value="deepseek">🔒 Lock: DeepSeek</option>
-      </select>
-      <input id="newKeyExpiry" type="number" placeholder="Expiry Days (e.g. 30, optional)" class="glass-input px-3 py-2 rounded-xl text-xs text-white" />
-      <input id="newKeyAllowedIps" type="text" placeholder="Allowed IPs (comma-separated, optional)" class="glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      <div>
+        <label data-i18n="keys.provider_lock" class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Kunci ke Provider Tertentu:</label>
+        <select id="newKeyEnforceProvider" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white">
+          <option value="" data-i18n="keys.all_providers">Semua Provider (Auto-Failover)</option>
+          <option value="openrouter">🔒 Lock: OpenRouter (Universal)</option>
+          <option value="gemini">🔒 Lock: Google Gemini</option>
+          <option value="openai">🔒 Lock: OpenAI</option>
+          <option value="anthropic">🔒 Lock: Anthropic Claude</option>
+          <option value="mistral">🔒 Lock: Mistral AI</option>
+          <option value="together">🔒 Lock: Together AI</option>
+          <option value="xai">🔒 Lock: xAI Grok</option>
+          <option value="cohere">🔒 Lock: Cohere AI</option>
+          <option value="perplexity">🔒 Lock: Perplexity AI</option>
+          <option value="ollama">🔒 Lock: Local Ollama</option>
+          <option value="groq">🔒 Lock: Groq Llama</option>
+          <option value="deepseek">🔒 Lock: DeepSeek</option>
+        </select>
+      </div>
 
-      <button onclick="createKey()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-brand-500/20">
-        <i data-lucide="key" class="w-3.5 h-3.5"></i>
-        <span>Generate Key</span>
-      </button>
+      <div>
+        <label class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Expiry Days (Opsional):</label>
+        <input id="newKeyExpiry" type="number" placeholder="e.g. 30 (0 = Permanent)" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white" />
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="block text-[10px] sm:text-[11px] font-semibold text-gray-400 mb-1">Allowed IPs (Comma-separated, opsional):</label>
+        <input id="newKeyAllowedIps" type="text" placeholder="e.g. 192.168.1.1, 10.0.0.0/24" class="w-full glass-input px-3 py-2 rounded-xl text-xs text-white font-mono" />
+      </div>
+
+      <div class="sm:col-span-2 lg:col-span-4 pt-1">
+        <button onclick="createKey()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-brand-500/20">
+          <i data-lucide="key" class="w-4 h-4"></i>
+          <span data-i18n="keys.btn_create">Terbitkan Virtual Key</span>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Active Keys Table Card -->
-  <div class="p-6 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
-    <div class="flex items-center justify-between">
-      <h3 class="text-sm font-bold text-white flex items-center gap-2">
-        <i data-lucide="shield" class="w-4 h-4 text-brand-400"></i>
-        <span>Active Virtual API Keys</span>
+  <div class="p-4 sm:p-6 rounded-xl sm:rounded-2xl glass-panel shadow-sm space-y-3.5 sm:space-y-4 border border-surface-700/60 w-full min-w-0">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
+      <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+        <i data-lucide="shield" class="w-4 h-4 text-brand-400 shrink-0"></i>
+        <span data-i18n="keys.active_title">Daftar Virtual Key Terdaftar</span>
       </h3>
-      <span class="text-xs text-gray-400">Klik &lt;/&gt; untuk menyalin instant SDK integration code</span>
+      <span class="text-[10px] sm:text-xs text-gray-400">Klik &lt;/&gt; untuk menyalin instant SDK integration code</span>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-surface-700/60">
-      <table class="w-full text-left text-xs">
-        <thead class="text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
+    <div class="responsive-table-container border border-surface-700/60 bg-surface-900/60">
+      <table class="w-full text-left text-xs min-w-[700px]">
+        <thead class="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
           <tr>
-            <th class="py-3 px-3.5">Name</th>
-            <th class="py-3 px-3.5">Project</th>
-            <th class="py-3 px-3.5">Bearer API Key</th>
-            <th class="py-3 px-3.5">Requests</th>
-            <th class="py-3 px-3.5">Tokens / Cap</th>
-            <th class="py-3 px-3.5">Est. Cost</th>
-            <th class="py-3 px-3.5">Status</th>
-            <th class="py-3 px-3.5 text-right">Actions</th>
+            <th class="py-2.5 px-3" data-i18n="keys.col_name">Nama</th>
+            <th class="py-2.5 px-3">Project</th>
+            <th class="py-2.5 px-3" data-i18n="keys.col_key">Virtual Key</th>
+            <th class="py-2.5 px-3">Requests</th>
+            <th class="py-2.5 px-3" data-i18n="keys.col_quota_usage">Penggunaan Kuota</th>
+            <th class="py-2.5 px-3" data-i18n="keys.col_cost_usage">Pengeluaran (USD)</th>
+            <th class="py-2.5 px-3" data-i18n="keys.col_status">Status</th>
+            <th class="py-2.5 px-3 text-right" data-i18n="keys.col_actions">Aksi</th>
           </tr>
         </thead>
         <tbody id="keysTableBody" class="divide-y divide-surface-700/40 bg-surface-900/40">
-          <tr><td colspan="8" class="py-8 text-center text-gray-500">Loading keys...</td></tr>
+          <tr><td colspan="8" class="py-8 text-center text-gray-500" data-i18n="overview.loading">Memuat kunci API...</td></tr>
         </tbody>
       </table>
     </div>

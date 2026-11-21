@@ -1,237 +1,248 @@
 <!-- VIEW 1: OVERVIEW & REALTIME ANALYTICS -->
-<div id="view-overview" class="space-y-6">
+<div id="view-overview" class="space-y-5 sm:space-y-6 w-full min-w-0">
   
-  <!-- Metrics Cards Grid -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
-      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total Requests</div>
-      <div id="statTotalRequests" class="text-xl sm:text-2xl font-black text-white">0</div>
+  <!-- Metrics Cards Grid (Responsive 2 cols on mobile, 3 on tablet, 6 on desktop) -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3.5 w-full min-w-0">
+    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-panel glass-panel-hover border border-white/5 min-w-0">
+      <div data-i18n="overview.total_requests" class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1 truncate">Total Permintaan</div>
+      <div id="statTotalRequests" class="text-lg sm:text-2xl font-black text-white truncate">0</div>
     </div>
-    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
-      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total Tokens</div>
-      <div id="statTotalTokens" class="text-xl sm:text-2xl font-black text-amber-400">0</div>
+    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-panel glass-panel-hover border border-white/5 min-w-0">
+      <div data-i18n="overview.total_tokens" class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1 truncate">Total Token</div>
+      <div id="statTotalTokens" class="text-lg sm:text-2xl font-black text-amber-400 truncate">0</div>
     </div>
-    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
-      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Est. Cost (USD)</div>
-      <div id="statTotalCost" class="text-xl sm:text-2xl font-black text-emerald-400">$0.0000</div>
+    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-panel glass-panel-hover border border-white/5 min-w-0">
+      <div data-i18n="overview.est_cost" class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1 truncate">Est. Biaya (USD)</div>
+      <div id="statTotalCost" class="text-lg sm:text-2xl font-black text-emerald-400 truncate">$0.0000</div>
     </div>
-    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
-      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Success Rate</div>
-      <div id="statSuccessRate" class="text-xl sm:text-2xl font-black text-blue-400">100%</div>
+    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-panel glass-panel-hover border border-white/5 min-w-0">
+      <div data-i18n="overview.success_rate" class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1 truncate">Tingkat Sukses</div>
+      <div id="statSuccessRate" class="text-lg sm:text-2xl font-black text-blue-400 truncate">100%</div>
     </div>
-    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
-      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Active Keys</div>
-      <div id="statActiveKeys" class="text-xl sm:text-2xl font-black text-purple-400">0</div>
+    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-panel glass-panel-hover border border-white/5 min-w-0">
+      <div data-i18n="overview.active_keys" class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1 truncate">Kunci Aktif</div>
+      <div id="statActiveKeys" class="text-lg sm:text-2xl font-black text-purple-400 truncate">0</div>
     </div>
-    <div class="p-4 rounded-2xl glass-panel glass-panel-hover border border-white/5">
-      <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Avg Latency</div>
-      <div id="statAvgLatency" class="text-xl sm:text-2xl font-black text-cyan-400">0ms</div>
+    <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl glass-panel glass-panel-hover border border-white/5 min-w-0">
+      <div data-i18n="overview.avg_latency" class="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5 sm:mb-1 truncate">Rata-rata Latensi</div>
+      <div id="statAvgLatency" class="text-lg sm:text-2xl font-black text-cyan-400 truncate">0ms</div>
     </div>
   </div>
 
   <!-- Server Telemetry & VPS Runtime Health -->
-  <div class="px-5 py-3 rounded-2xl glass-panel flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border border-surface-700/60 shadow-sm">
-    <div class="flex items-center gap-3">
-      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-      <div class="flex items-center gap-2">
-        <span class="text-gray-400">Node & Platform:</span>
-        <span id="sysPlatform" class="font-mono font-bold text-white">Memuat...</span>
+  <div class="px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl glass-panel flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs border border-surface-700/60 shadow-sm w-full min-w-0">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-emerald shrink-0"></div>
+      <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+        <span data-i18n="overview.node_platform" class="text-gray-400 shrink-0">Node & Platform:</span>
+        <span id="sysPlatform" class="font-mono font-bold text-white text-[11px] sm:text-xs truncate">Memuat...</span>
       </div>
     </div>
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-2">
-        <span class="text-gray-400">RAM:</span>
+    <div class="flex items-center gap-4 sm:gap-6 flex-wrap text-[11px] sm:text-xs shrink-0">
+      <div class="flex items-center gap-1.5">
+        <span data-i18n="overview.ram" class="text-gray-400">RAM:</span>
         <span id="sysMemory" class="font-mono text-cyan-300 font-bold">Memuat...</span>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-gray-400">Uptime:</span>
+      <div class="flex items-center gap-1.5">
+        <span data-i18n="overview.uptime" class="text-gray-400">Uptime:</span>
         <span id="sysUptime" class="font-mono text-emerald-400 font-bold">Memuat...</span>
       </div>
     </div>
   </div>
 
   <!-- 7-Day Visual Analytics Trend Chart -->
-  <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
-    <div class="flex items-center justify-between">
+  <div class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl glass-panel shadow-sm space-y-3 sm:space-y-4 border border-surface-700/60 w-full min-w-0">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
       <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
-        <span>Daily Traffic & Token Consumption (7 Hari Terakhir)</span>
+        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+        <span data-i18n="overview.daily_traffic_title">Traffic Harian & Konsumsi Token (7 Hari Terakhir)</span>
       </h3>
-      <span class="text-[11px] text-gray-400">Statistik real-time tren harian</span>
+      <span data-i18n="overview.daily_traffic_subtitle" class="text-[10px] sm:text-[11px] text-gray-400">Statistik real-time tren harian</span>
     </div>
-    <div id="analyticsChartContainer" class="w-full h-40 flex items-end gap-2 pt-4 pb-2 border-b border-surface-700/60">
-      <div class="w-full text-center py-6 text-gray-500 text-xs">Memuat visualisasi statistik 7 hari...</div>
-    </div>
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-gray-400">
-      <div class="flex items-center gap-4">
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-brand-500 inline-block"></span> Total Requests</span>
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-400 inline-block"></span> Token Consumption</span>
+
+    <!-- Chart Container with touch scroll support -->
+    <div class="w-full overflow-x-auto no-scrollbar pb-1">
+      <div id="analyticsChartContainer" class="min-w-[420px] sm:min-w-full h-36 sm:h-40 flex items-end gap-1.5 sm:gap-2 pt-4 pb-2 border-b border-surface-700/60">
+        <div data-i18n="overview.loading" class="w-full text-center py-6 text-gray-500 text-xs">Memuat visualisasi statistik 7 hari...</div>
       </div>
-      <span id="chartTotalSummary" class="text-xs text-gray-300">Menghitung akumulasi transaksi...</span>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px] sm:text-[11px] text-gray-400">
+      <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-brand-500 inline-block"></span> <span data-i18n="overview.legend_requests">Total Permintaan</span></span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-400 inline-block"></span> <span data-i18n="overview.legend_tokens">Konsumsi Token</span></span>
+      </div>
+      <span id="chartTotalSummary" data-i18n="overview.calculating_summary" class="text-[11px] text-gray-300">Menghitung akumulasi transaksi...</span>
     </div>
   </div>
 
   <!-- Traffic Distribution by Provider -->
-  <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-3 border border-surface-700/60">
-    <div class="flex items-center justify-between">
+  <div class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl glass-panel shadow-sm space-y-3 border border-surface-700/60 w-full min-w-0">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
       <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-        <i data-lucide="pie-chart" class="w-4 h-4 text-brand-400"></i>
-        <span>Live Provider Traffic Distribution</span>
+        <i data-lucide="pie-chart" class="w-4 h-4 text-brand-400 shrink-0"></i>
+        <span data-i18n="overview.provider_dist_title">Distribusi Traffic Penyedia Realtime</span>
       </h3>
-      <span class="text-[11px] text-gray-400">Auto-balanced multi-provider telemetry</span>
+      <span data-i18n="overview.provider_dist_subtitle" class="text-[10px] sm:text-[11px] text-gray-400">Telemetri auto-balance multi-provider</span>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-2">
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 pt-1.5 w-full min-w-0">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-blue-400">Gemini</span>
           <span id="lbl-gemini" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-gemini" class="bg-blue-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-gemini" class="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-emerald-400">OpenAI</span>
           <span id="lbl-openai" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-openai" class="bg-emerald-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-openai" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-amber-400">Anthropic</span>
           <span id="lbl-anthropic" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-anthropic" class="bg-amber-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-anthropic" class="bg-amber-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-indigo-400">OpenRouter</span>
           <span id="lbl-openrouter" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-openrouter" class="bg-indigo-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-openrouter" class="bg-indigo-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-orange-400">Mistral</span>
           <span id="lbl-mistral" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-mistral" class="bg-orange-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-mistral" class="bg-orange-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
-          <span class="text-cyan-400">Groq Cloud</span>
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
+          <span class="text-cyan-400">Groq</span>
           <span id="lbl-groq" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-groq" class="bg-cyan-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-groq" class="bg-cyan-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-purple-400">DeepSeek</span>
           <span id="lbl-deepseek" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-deepseek" class="bg-purple-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-deepseek" class="bg-purple-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-stone-300">xAI (Grok)</span>
           <span id="lbl-xai" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-xai" class="bg-stone-400 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-xai" class="bg-stone-400 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-teal-400">Cohere</span>
           <span id="lbl-cohere" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-cohere" class="bg-teal-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-cohere" class="bg-teal-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-emerald-400">Perplexity</span>
           <span id="lbl-perplexity" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-perplexity" class="bg-emerald-400 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-perplexity" class="bg-emerald-400 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-rose-400">Ollama Local</span>
           <span id="lbl-ollama" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-ollama" class="bg-rose-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-ollama" class="bg-rose-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
-      <div class="bg-surface-900/70 p-2.5 rounded-xl border border-surface-700/60">
-        <div class="flex justify-between text-[11px] font-semibold mb-1">
+      <div class="bg-surface-900/70 p-2 sm:p-2.5 rounded-xl border border-surface-700/60">
+        <div class="flex justify-between text-[10px] sm:text-[11px] font-semibold mb-1">
           <span class="text-fuchsia-400">Audio / Speech</span>
           <span id="lbl-audio" class="text-gray-300">0%</span>
         </div>
-        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-audio" class="bg-fuchsia-500 h-1.5 rounded-full" style="width:0%"></div></div>
+        <div class="w-full bg-surface-800 rounded-full h-1.5"><div id="bar-audio" class="bg-fuchsia-500 h-1.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
       </div>
     </div>
   </div>
 
   <!-- Realtime Request Logs Table -->
-  <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-4 border border-surface-700/60">
+  <div class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl glass-panel shadow-sm space-y-3 sm:space-y-4 border border-surface-700/60 w-full min-w-0">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-          <i data-lucide="list" class="w-4 h-4 text-brand-400"></i>
-          <span>Realtime Request Logs</span>
+        <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="list" class="w-4 h-4 text-brand-400 shrink-0"></i>
+          <span data-i18n="overview.logs_title">Log Permintaan Realtime</span>
         </h3>
-        <button onclick="toggleLiveLogStream()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-900 text-xs text-gray-300 border border-surface-700 hover:text-white transition-all">
+        <button onclick="toggleLiveLogStream()" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg bg-surface-900 text-xs text-gray-300 border border-surface-700 hover:text-white transition-all">
           <span id="liveDot" class="w-2 h-2 rounded-full bg-gray-500"></span>
-          <span id="liveText" class="text-[11px] font-semibold">Live Stream (Off)</span>
+          <span id="liveText" data-i18n="overview.live_stream_off" class="text-[10px] sm:text-[11px] font-semibold">Live Stream (Off)</span>
         </button>
       </div>
 
-      <!-- Log Filters -->
-      <div class="flex items-center flex-wrap gap-2">
-        <input id="searchLogs" type="text" placeholder="Search prompt, model..." oninput="filterAndRenderLogs()"
-          class="glass-input px-3 py-1.5 rounded-xl text-xs text-white placeholder-gray-500 w-36 sm:w-48 font-mono" />
-        <select id="filterProject" onchange="filterAndRenderLogs()" class="glass-input px-2.5 py-1.5 rounded-xl text-xs text-white">
-          <option value="ALL">All Projects</option>
+      <!-- Log Filters & Quick Actions -->
+      <div class="flex items-center flex-wrap gap-1.5 sm:gap-2 w-full sm:w-auto">
+        <input id="searchLogs" type="text" data-i18n-placeholder="overview.search_logs" placeholder="Cari prompt, model..." oninput="filterAndRenderLogs()"
+          class="glass-input px-2.5 py-1.5 rounded-xl text-xs text-white placeholder-gray-500 w-full sm:w-40 font-mono" />
+        <select id="filterProject" onchange="filterAndRenderLogs()" class="glass-input px-2 py-1.5 rounded-xl text-xs text-white grow sm:grow-0">
+          <option value="ALL" data-i18n="overview.all_projects">Semua Project</option>
         </select>
-        <select id="filterStatus" onchange="filterAndRenderLogs()" class="glass-input px-2.5 py-1.5 rounded-xl text-xs text-white">
-          <option value="ALL">All Status</option>
-          <option value="success">Success (200)</option>
-          <option value="error">Error / Budget Exceeded</option>
+        <select id="filterStatus" onchange="filterAndRenderLogs()" class="glass-input px-2 py-1.5 rounded-xl text-xs text-white grow sm:grow-0">
+          <option value="ALL" data-i18n="overview.all_status">Semua Status</option>
+          <option value="success" data-i18n="overview.status_success">Berhasil (200)</option>
+          <option value="error" data-i18n="overview.status_error">Error / Anggaran Habis</option>
         </select>
-        <button onclick="downloadLogsCsv()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Export CSV">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i>
-          <span>CSV</span>
-        </button>
-        <button onclick="downloadLogsJson()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Export JSON">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-          <span>JSON</span>
-        </button>
-        <button onclick="clearAllLogs()" class="text-xs bg-rose-600/80 hover:bg-rose-600 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Clear all logs">
-          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          <span>Clear</span>
-        </button>
-        <button onclick="loadLogs()" class="text-xs bg-surface-700 hover:bg-surface-600 text-gray-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>Refresh</span>
-        </button>
+        <div class="flex items-center gap-1.5 ml-auto sm:ml-0">
+          <button onclick="downloadLogsCsv()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition-all shadow-sm" title="Export CSV">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span data-i18n="overview.export_csv">CSV</span>
+          </button>
+          <button onclick="downloadLogsJson()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition-all shadow-sm" title="Export JSON">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span data-i18n="overview.export_json">JSON</span>
+          </button>
+          <button onclick="clearAllLogs()" class="text-xs bg-rose-600/80 hover:bg-rose-600 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition-all shadow-sm" data-i18n-title="overview.clear_logs" title="Clear all logs">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span data-i18n="overview.clear_logs">Clear</span>
+          </button>
+          <button onclick="loadLogs()" class="text-xs bg-surface-700 hover:bg-surface-600 text-gray-200 px-2.5 py-1.5 rounded-xl flex items-center gap-1 transition-all" data-i18n-title="overview.refresh_logs" title="Refresh">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span data-i18n="overview.refresh_logs">Refresh</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="overflow-x-auto rounded-xl border border-surface-700/60">
-      <table class="w-full text-left text-xs">
-        <thead class="text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
+    <!-- Responsive Table Container -->
+    <div class="responsive-table-container border border-surface-700/60 bg-surface-900/60">
+      <table class="w-full text-left text-xs min-w-[650px]">
+        <thead class="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase bg-surface-900/90 border-b border-surface-700/80">
           <tr>
-            <th class="py-3 px-3.5">Time</th>
-            <th class="py-3 px-3.5">Project</th>
-            <th class="py-3 px-3.5">Model Requested</th>
-            <th class="py-3 px-3.5">Provider Used</th>
-            <th class="py-3 px-3.5">Tokens</th>
-            <th class="py-3 px-3.5">Est. Cost</th>
-            <th class="py-3 px-3.5">Latency</th>
-            <th class="py-3 px-3.5">Status</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_time">Waktu</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_project">Project</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_model">Model Diminta</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_provider">Penyedia Digunakan</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_tokens">Token</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_cost">Est. Biaya</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_latency">Latensi</th>
+            <th class="py-2.5 px-3" data-i18n="overview.col_status">Status</th>
           </tr>
         </thead>
-        <tbody id="logsTableBody" class="divide-y divide-surface-700/40 bg-surface-900/40">
-          <tr><td colspan="8" class="py-8 text-center text-gray-500">Loading requests...</td></tr>
+        <tbody id="logsTableBody" class="divide-y divide-surface-800">
+          <tr>
+            <td colspan="8" class="text-center py-8 text-gray-500 font-mono text-xs" data-i18n="overview.loading">Memuat riwayat transaksi...</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
+
 </div>

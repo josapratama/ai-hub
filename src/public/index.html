@@ -2,13 +2,13 @@
 <html lang="id" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>AI Hub - Enterprise AI Gateway & Multi-Provider Router</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='16' height='16' x='4' y='4' rx='2'/><rect width='6' height='6' x='9' y='9' rx='1'/><path d='M15 2v2'/><path d='M15 20v2'/><path d='M2 15h2'/><path d='M2 9h2'/><path d='M20 15h2'/><path d='M20 9h2'/><path d='M9 2v2'/><path d='M9 20v2'/></svg>" />
 
-  <!-- Tailwind CSS & Lucide Icons -->
+  <!-- Tailwind CSS & Lucide Icons & Marked -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -47,79 +47,104 @@
 
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Polyglot Hub Client i18n Engine -->
+  <script src="/js/i18n.js"></script>
 </head>
-<body class="bg-surface-950 text-gray-100 min-h-screen antialiased flex flex-col selection:bg-brand-500 selection:text-white">
+<body class="bg-surface-950 text-gray-100 min-h-screen antialiased flex flex-col selection:bg-brand-500 selection:text-white overflow-x-hidden w-full max-w-full">
 
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
 
   <!-- Top Navigation & Header -->
-  <header class="sticky top-0 z-40 glass-panel border-b border-surface-700/60 shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
+  <header class="sticky top-0 z-40 glass-panel border-b border-surface-700/60 shadow-lg w-full">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-2">
         
         <!-- Logo & Status Indicator -->
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
-            <i data-lucide="cpu" class="w-5 h-5"></i>
+        <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/25 shrink-0">
+            <i data-lucide="cpu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="font-extrabold text-base tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">AI HUB</span>
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-900/80 text-brand-300 border border-brand-700/60">Gateway</span>
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <span class="font-extrabold text-sm sm:text-base tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">AI HUB</span>
+              <span data-i18n="nav.gateway_badge" class="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-brand-900/80 text-brand-300 border border-brand-700/60">Gateway</span>
             </div>
-            <div class="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
+            <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-emerald-400 font-medium">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-emerald"></span>
-              <span>Online • Multi-Provider</span>
+              <span data-i18n="nav.status_online">Online • Multi-Provider</span>
             </div>
           </div>
         </div>
 
         <!-- Desktop Navigation Tabs -->
-        <nav class="hidden md:flex items-center gap-1.5 bg-surface-900/80 p-1.5 rounded-2xl border border-surface-700/60 shadow-inner">
-          <button id="tab-overview" onclick="switchTab('overview')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 tab-active">
+        <nav class="hidden md:flex items-center gap-1 bg-surface-900/80 p-1.5 rounded-2xl border border-surface-700/60 shadow-inner">
+          <button id="tab-overview" onclick="switchTab('overview')" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 tab-active">
             <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-            <span>Overview</span>
+            <span data-i18n="nav.overview">Overview</span>
           </button>
-          <button id="tab-agents" onclick="switchTab('agents')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white hover:bg-surface-700/60">
+          <button id="tab-agents" onclick="switchTab('agents')" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-400 hover:text-white hover:bg-surface-700/60">
             <i data-lucide="bot" class="w-3.5 h-3.5 text-indigo-400"></i>
-            <span>Agents & MCP</span>
+            <span data-i18n="nav.agents">Agents & MCP</span>
           </button>
-          <button id="tab-keys" onclick="switchTab('keys')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white hover:bg-surface-700/60">
+          <button id="tab-keys" onclick="switchTab('keys')" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-400 hover:text-white hover:bg-surface-700/60">
             <i data-lucide="key" class="w-3.5 h-3.5"></i>
-            <span>API Keys & Budgets</span>
+            <span data-i18n="nav.keys">API Keys & Budgets</span>
           </button>
-          <button id="tab-providers" onclick="switchTab('providers')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white hover:bg-surface-700/60">
+          <button id="tab-providers" onclick="switchTab('providers')" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-400 hover:text-white hover:bg-surface-700/60">
             <i data-lucide="server" class="w-3.5 h-3.5"></i>
-            <span>Providers & Routing</span>
+            <span data-i18n="nav.providers">Providers & Routing</span>
           </button>
-          <button id="tab-playground" onclick="switchTab('playground')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white hover:bg-surface-700/60">
+          <button id="tab-playground" onclick="switchTab('playground')" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-400 hover:text-white hover:bg-surface-700/60">
             <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
-            <span>Playground & Studio</span>
+            <span data-i18n="nav.playground">Playground & Studio</span>
           </button>
-          <button id="tab-docs" onclick="switchTab('docs')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 text-gray-400 hover:text-white hover:bg-surface-700/60">
+          <button id="tab-docs" onclick="switchTab('docs')" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 text-gray-400 hover:text-white hover:bg-surface-700/60">
             <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
-            <span>Docs</span>
+            <span data-i18n="nav.docs">Docs</span>
           </button>
         </nav>
 
-        <!-- Right Quick Controls: Master Token & Refresh -->
-        <div class="flex items-center gap-2.5">
+        <!-- Right Quick Controls: Language Selector, Master Token & Refresh -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          
+          <!-- Polyglot Hub Language Selector Dropdown -->
+          <div class="relative group">
+            <button class="px-2.5 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-200 border border-surface-700/60 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+              <span id="currentLangBadge">🇮🇩 ID</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400"></i>
+            </button>
+            <div class="absolute right-0 mt-1 w-36 py-1 bg-surface-900 border border-surface-700/80 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all z-50">
+              <button onclick="setLanguage('id')" data-lang="id" class="lang-option w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-surface-800 text-gray-300">
+                <span>🇮🇩</span> <span>Indonesia</span>
+              </button>
+              <button onclick="setLanguage('en')" data-lang="en" class="lang-option w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-surface-800 text-gray-300">
+                <span>🇬🇧</span> <span>English</span>
+              </button>
+              <button onclick="setLanguage('ja')" data-lang="ja" class="lang-option w-full text-left px-3 py-1.5 text-xs flex items-center gap-2 hover:bg-surface-800 text-gray-300">
+                <span>🇯🇵</span> <span>日本語</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Master Admin Token input (Desktop) -->
           <div class="hidden lg:flex items-center gap-1.5 bg-surface-900/90 border border-surface-700/70 rounded-xl px-2.5 py-1">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-400"></i>
-            <input id="adminTokenInput" type="password" placeholder="Master Admin Token"
-              class="bg-transparent text-xs text-white focus:outline-none w-36 font-mono" />
-            <button onclick="saveAdminToken()" class="text-[10px] font-bold bg-brand-600 hover:bg-brand-500 text-white px-2 py-0.5 rounded-lg transition-colors" title="Save Token">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-400 shrink-0"></i>
+            <input id="adminTokenInput" type="password" data-i18n-placeholder="nav.master_token" placeholder="Master Admin Token"
+              class="bg-transparent text-xs text-white focus:outline-none w-32 font-mono" />
+            <button onclick="saveAdminToken()" data-i18n="nav.save" class="text-[10px] font-bold bg-brand-600 hover:bg-brand-500 text-white px-2 py-0.5 rounded-lg transition-colors">
               Save
             </button>
           </div>
 
-          <button onclick="refreshAll()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-300 hover:text-white border border-surface-700/60 transition-all shadow-sm" title="Refresh Dashboard">
+          <!-- Refresh Button -->
+          <button onclick="refreshAll()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-300 hover:text-white border border-surface-700/60 transition-all shadow-sm shrink-0" data-i18n-title="nav.refresh" title="Refresh Dashboard">
             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
           </button>
 
           <!-- Mobile Hamburger Toggle -->
-          <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-300 border border-surface-700/60">
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-300 border border-surface-700/60 shrink-0" title="Menu">
             <i data-lucide="menu" class="w-4 h-4"></i>
           </button>
         </div>
@@ -127,38 +152,64 @@
     </div>
 
     <!-- Mobile Drawer Navigation -->
-    <div id="mobileMenu" class="md:hidden hidden border-t border-surface-700/60 bg-surface-900/95 px-4 pt-3 pb-4 space-y-2">
-      <button id="mobile-tab-overview" onclick="switchTab('overview')" class="w-full px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2 text-left tab-active">
-        <i data-lucide="activity" class="w-4 h-4"></i> Overview
+    <div id="mobileMenu" class="md:hidden hidden border-t border-surface-700/60 bg-surface-900/95 px-3 pt-3 pb-4 space-y-1.5 shadow-2xl backdrop-blur-xl">
+      <button id="mobile-tab-overview" onclick="switchTab('overview')" class="w-full px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2.5 text-left tab-active">
+        <i data-lucide="activity" class="w-4 h-4"></i>
+        <span data-i18n="nav.overview">Overview</span>
       </button>
-      <button id="mobile-tab-agents" onclick="switchTab('agents')" class="w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-left text-gray-300 hover:bg-surface-800">
-        <i data-lucide="bot" class="w-4 h-4 text-indigo-400"></i> Agents & MCP Hub
+      <button id="mobile-tab-agents" onclick="switchTab('agents')" class="w-full px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 text-left text-gray-300 hover:bg-surface-800">
+        <i data-lucide="bot" class="w-4 h-4 text-indigo-400"></i>
+        <span data-i18n="nav.agents">Agents & MCP</span>
       </button>
-      <button id="mobile-tab-keys" onclick="switchTab('keys')" class="w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-left text-gray-300 hover:bg-surface-800">
-        <i data-lucide="key" class="w-4 h-4"></i> API Keys & Budgets
+      <button id="mobile-tab-keys" onclick="switchTab('keys')" class="w-full px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 text-left text-gray-300 hover:bg-surface-800">
+        <i data-lucide="key" class="w-4 h-4"></i>
+        <span data-i18n="nav.keys">API Keys & Budgets</span>
       </button>
-      <button id="mobile-tab-providers" onclick="switchTab('providers')" class="w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-left text-gray-300 hover:bg-surface-800">
-        <i data-lucide="server" class="w-4 h-4"></i> Providers & Routing
+      <button id="mobile-tab-providers" onclick="switchTab('providers')" class="w-full px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 text-left text-gray-300 hover:bg-surface-800">
+        <i data-lucide="server" class="w-4 h-4"></i>
+        <span data-i18n="nav.providers">Providers & Routing</span>
       </button>
-      <button id="mobile-tab-playground" onclick="switchTab('playground')" class="w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-left text-gray-300 hover:bg-surface-800">
-        <i data-lucide="terminal" class="w-4 h-4"></i> Playground & Studio
+      <button id="mobile-tab-playground" onclick="switchTab('playground')" class="w-full px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 text-left text-gray-300 hover:bg-surface-800">
+        <i data-lucide="terminal" class="w-4 h-4"></i>
+        <span data-i18n="nav.playground">Playground & Studio</span>
       </button>
-      <button id="mobile-tab-docs" onclick="switchTab('docs')" class="w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-left text-gray-300 hover:bg-surface-800">
-        <i data-lucide="book-open" class="w-4 h-4"></i> Documentation
+      <button id="mobile-tab-docs" onclick="switchTab('docs')" class="w-full px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 text-left text-gray-300 hover:bg-surface-800">
+        <i data-lucide="book-open" class="w-4 h-4"></i>
+        <span data-i18n="nav.docs">Documentation</span>
       </button>
 
+      <!-- Language Selector in Mobile Drawer -->
+      <div class="pt-2.5 mt-2 border-t border-surface-700/60">
+        <div class="text-[11px] font-semibold text-gray-400 mb-1.5" data-i18n="nav.language">Bahasa:</div>
+        <div class="grid grid-cols-3 gap-1.5">
+          <button onclick="setLanguage('id')" class="px-2.5 py-1.5 rounded-lg bg-surface-800 text-xs font-medium text-center hover:bg-surface-700 text-white">
+            🇮🇩 ID
+          </button>
+          <button onclick="setLanguage('en')" class="px-2.5 py-1.5 rounded-lg bg-surface-800 text-xs font-medium text-center hover:bg-surface-700 text-white">
+            🇬🇧 EN
+          </button>
+          <button onclick="setLanguage('ja')" class="px-2.5 py-1.5 rounded-lg bg-surface-800 text-xs font-medium text-center hover:bg-surface-700 text-white">
+            🇯🇵 JA
+          </button>
+        </div>
+      </div>
+
+      <!-- Master Token in Mobile Drawer -->
       <div class="pt-2 border-t border-surface-700/60">
-        <label class="block text-[11px] text-gray-400 mb-1">Master Token:</label>
+        <label class="block text-[11px] text-gray-400 mb-1" data-i18n="nav.master_token">Master Admin Token:</label>
         <div class="flex items-center gap-2">
           <input id="adminTokenInputMobile" type="password" onchange="document.getElementById('adminTokenInput').value=this.value; saveAdminToken();"
-            class="w-full glass-input px-3 py-1.5 rounded-lg text-xs text-white font-mono" placeholder="Master Admin Token" />
+            class="w-full glass-input px-3 py-1.5 rounded-lg text-xs text-white font-mono" data-i18n-placeholder="nav.master_token" placeholder="Master Admin Token" />
+          <button onclick="saveAdminToken()" data-i18n="nav.save" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-xs font-bold text-white shrink-0">
+            Save
+          </button>
         </div>
       </div>
     </div>
   </header>
 
   <!-- Main Content Container with Modular Partial Views -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1">
+  <main class="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8 flex-1 min-w-0 overflow-x-hidden">
     <!--#include file="views/overview.html" -->
     <!--#include file="views/agents.html" -->
     <!--#include file="views/keys.html" -->
@@ -167,17 +218,15 @@
     <!--#include file="views/docs.html" -->
   </main>
 
-  <!-- Modals Layer -->
+  <!-- Modals Partial -->
   <!--#include file="views/modals.html" -->
 
-  <!-- Modular Scripts Architecture -->
-  <script src="/js/api.js"></script>
+  <!-- Application Logic & Scripts -->
+  <script src="/js/app.js"></script>
   <script src="/js/overview.js"></script>
-  <script src="/js/logs.js"></script>
+  <script src="/js/agents.js"></script>
   <script src="/js/keys.js"></script>
   <script src="/js/providers.js"></script>
   <script src="/js/playground.js"></script>
-  <script src="/js/agents.js"></script>
-  <script src="/js/app.js"></script>
 </body>
 </html>
