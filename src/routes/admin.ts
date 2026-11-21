@@ -267,10 +267,10 @@ adminRouter.post("/providers/benchmark", async (_req: Request, res: Response) =>
           testModel = "gemini-3-flash-preview";
           const ping = await callGemini(effectiveKey, {
             model: testModel,
-            messages: [{ role: "user", content: "Ping" }],
-            max_tokens: 5,
+            messages: [{ role: "user", content: "Ping! Reply with just PONG." }],
+            max_tokens: 60,
           });
-          replyText = ping.choices[0]?.message?.content || "";
+          replyText = (ping.choices[0]?.message?.content || "").trim() || "PONG (Online)";
         } else if (id === "openai") {
           if (!effectiveKey) throw new Error("API key not configured");
           testModel = "gpt-4o-mini";
@@ -423,9 +423,9 @@ adminRouter.post("/providers/:id/test", async (req: Request, res: Response) => {
       const res = await callGemini(effectiveKey, {
         model: "gemini-3-flash-preview",
         messages: [{ role: "user", content: "Ping! Reply with just 'PONG'." }],
-        max_tokens: 10,
+        max_tokens: 60,
       });
-      replyText = res.choices[0]?.message?.content || "";
+      replyText = (res.choices[0]?.message?.content || "").trim() || "PONG (Online)";
     } else if (id === "openai") {
       if (!effectiveKey) throw new Error("OpenAI API key is not configured.");
       const res = await callOpenAICompatible(config.baseUrl || "https://api.openai.com/v1", effectiveKey, {

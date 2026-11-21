@@ -7,7 +7,25 @@
   const SUPPORTED_LANGS = ["id", "en", "ja"];
   const DEFAULT_LANG = "id";
 
-  let currentLang = localStorage.getItem("ai_hub_locale") || DEFAULT_LANG;
+  const memoryStore = {};
+  function safeStorageGet(key, fallback = "") {
+    try {
+      const val = localStorage.getItem(key);
+      return val !== null && val !== undefined ? val : fallback;
+    } catch {
+      return memoryStore[key] !== undefined ? memoryStore[key] : fallback;
+    }
+  }
+
+  function safeStorageSet(key, val) {
+    try {
+      localStorage.setItem(key, val);
+    } catch {
+      memoryStore[key] = val;
+    }
+  }
+
+  let currentLang = safeStorageGet("ai_hub_locale", DEFAULT_LANG);
   if (!SUPPORTED_LANGS.includes(currentLang)) {
     currentLang = DEFAULT_LANG;
   }
@@ -109,7 +127,7 @@
   async function setLanguage(lang) {
     if (!SUPPORTED_LANGS.includes(lang)) return;
     currentLang = lang;
-    localStorage.setItem("ai_hub_locale", lang);
+    safeStorageSet("ai_hub_locale", lang);
     document.documentElement.lang = lang;
 
     await loadDictionary(lang);

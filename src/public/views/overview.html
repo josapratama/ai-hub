@@ -102,9 +102,9 @@
       <span data-i18n="overview.daily_traffic_subtitle" class="text-[10px] sm:text-[11px] text-gray-400">Statistik real-time tren harian</span>
     </div>
 
-    <!-- Chart Container with touch scroll support -->
-    <div class="w-full overflow-x-auto no-scrollbar pb-1">
-      <div id="analyticsChartContainer" class="min-w-[420px] sm:min-w-full h-36 sm:h-40 flex items-end gap-1.5 sm:gap-2 pt-4 pb-2 border-b border-surface-700/60">
+    <!-- Chart Container with fluid responsive width -->
+    <div class="w-full overflow-hidden pb-1">
+      <div id="analyticsChartContainer" class="w-full h-32 sm:h-40 flex items-end gap-1 sm:gap-2 pt-4 pb-2 border-b border-surface-700/60 min-w-0">
         <div data-i18n="overview.loading" class="w-full text-center py-6 text-gray-500 text-xs">Memuat visualisasi statistik 7 hari...</div>
       </div>
     </div>

@@ -1,6 +1,23 @@
 // AI Hub - Core API Client, Auth & UI Notifications
 
-let adminToken = localStorage.getItem("ai_hub_admin_token") || "aih_admin_secret_2026";
+const _memStorage = {};
+function safeStorageGet(key, fallback = "") {
+  try {
+    const val = localStorage.getItem(key);
+    return val !== null && val !== undefined ? val : fallback;
+  } catch {
+    return _memStorage[key] !== undefined ? _memStorage[key] : fallback;
+  }
+}
+function safeStorageSet(key, val) {
+  try {
+    localStorage.setItem(key, val);
+  } catch {
+    _memStorage[key] = val;
+  }
+}
+
+let adminToken = safeStorageGet("ai_hub_admin_token", "aih_admin_secret_2026");
 
 function getAdminToken() {
   return adminToken;
@@ -13,7 +30,7 @@ function saveAdminToken() {
   if (!val) return;
 
   adminToken = val;
-  localStorage.setItem("ai_hub_admin_token", adminToken);
+  safeStorageSet("ai_hub_admin_token", adminToken);
   if (input) input.value = val;
   if (mobileInput) mobileInput.value = val;
 
