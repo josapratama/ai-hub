@@ -26,6 +26,8 @@ RUN corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm install -
 COPY --from=builder /app/dist ./dist
 RUN mkdir -p /app/data
 
+VOLUME ["/app/data"]
+
 EXPOSE 4000
 
 CMD ["node", "dist/server.js"]

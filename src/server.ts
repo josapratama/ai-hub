@@ -33,6 +33,25 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.get("/health/providers", (_req, res) => {
+  const providers = db.getProviders();
+  const summary: Record<string, any> = {};
+  for (const [id, cfg] of Object.entries(providers)) {
+    summary[id] = {
+      name: cfg.name,
+      isEnabled: cfg.isEnabled,
+      isAvailable: cfg.isAvailable,
+      modelsCount: cfg.models.length,
+      hasKey: Boolean(cfg.apiKey && cfg.apiKey.length > 5) || id === "ollama",
+    };
+  }
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    providers: summary,
+  });
+});
+
 // OpenAI-compatible v1 router (used by nexus-chat, resumecraft, python, curl, etc.)
 app.use("/v1", v1Router);
 

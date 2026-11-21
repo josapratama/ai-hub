@@ -136,13 +136,38 @@ export async function executeChatCompletion(
   const settings = db.getSettings();
   const providers = db.getProviders();
 
-  // Resolve model and aliases
-  let targetModel = rawRequest.model;
-  if (!targetModel || targetModel === "auto" || targetModel === "default") {
+  // Resolve model, aliases, and smart intents
+  const rawModel = (rawRequest.model || "").trim().toLowerCase();
+  let targetModel = rawRequest.model || "";
+
+  if (!rawModel || rawModel === "auto" || rawModel === "default") {
     targetModel = settings.defaultModel || "gemini-2.0-flash";
-  }
-  if (settings.customAliases?.[targetModel]) {
+  } else if (rawModel === "fastest") {
+    if (providers.groq?.isEnabled && providers.groq?.isAvailable) {
+      targetModel = "llama-3.3-70b-versatile";
+    } else {
+      targetModel = "gemini-2.0-flash";
+    }
+  } else if (rawModel === "cheapest") {
+    if (providers.deepseek?.isEnabled && providers.deepseek?.isAvailable) {
+      targetModel = "deepseek-chat";
+    } else {
+      targetModel = "gemini-2.0-flash";
+    }
+  } else if (rawModel === "smartest") {
+    if (providers.openai?.isEnabled && providers.openai?.isAvailable) {
+      targetModel = "gpt-4o";
+    } else if (providers.anthropic?.isEnabled && providers.anthropic?.isAvailable) {
+      targetModel = "claude-3-5-sonnet-20241022";
+    } else {
+      targetModel = "gemini-1.5-pro";
+    }
+  } else if (settings.customAliases?.[rawModel]) {
+    targetModel = settings.customAliases[rawModel];
+  } else if (settings.customAliases?.[targetModel]) {
     targetModel = settings.customAliases[targetModel];
+  } else if (MODEL_ALIASES[rawModel]) {
+    targetModel = MODEL_ALIASES[rawModel];
   } else if (MODEL_ALIASES[targetModel]) {
     targetModel = MODEL_ALIASES[targetModel];
   }

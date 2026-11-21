@@ -183,6 +183,27 @@
         </div>
       </div>
 
+      <!-- 7-Day Visual Analytics Trend Chart -->
+      <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+            <span>Daily Traffic & Token Consumption (7 Hari Terakhir)</span>
+          </h3>
+          <span class="text-[11px] text-gray-400">Statistik real-time tren harian</span>
+        </div>
+        <div id="analyticsChartContainer" class="w-full h-40 flex items-end gap-2 pt-4 pb-2 border-b border-surface-700/60">
+          <div class="w-full text-center py-6 text-gray-500 text-xs">Memuat visualisasi statistik 7 hari...</div>
+        </div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-gray-400">
+          <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-brand-500 inline-block"></span> Total Requests</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-400 inline-block"></span> Token Consumption</span>
+          </div>
+          <span id="chartTotalSummary" class="text-xs text-gray-300">Menghitung akumulasi transaksi...</span>
+        </div>
+      </div>
+
       <!-- Traffic Distribution by Provider -->
       <div class="p-5 rounded-2xl glass-panel shadow-sm space-y-3">
         <div class="flex items-center justify-between">
@@ -307,9 +328,17 @@
               <option value="success">Success (200)</option>
               <option value="error">Error / Budget Exceeded</option>
             </select>
-            <button onclick="downloadLogsCsv()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+            <button onclick="downloadLogsCsv()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Export CSV">
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
-              <span>Export CSV</span>
+              <span>CSV</span>
+            </button>
+            <button onclick="downloadLogsJson()" class="text-xs bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Export JSON">
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+              <span>JSON</span>
+            </button>
+            <button onclick="clearAllLogs()" class="text-xs bg-rose-600/80 hover:bg-rose-600 text-white font-semibold px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-sm" title="Clear all logs">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Clear</span>
             </button>
             <button onclick="loadLogs()" class="text-xs bg-surface-700 hover:bg-surface-600 text-gray-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
@@ -807,20 +836,28 @@
             <div class="flex items-center gap-1.5">
               <label class="text-[11px] text-gray-400 font-semibold">Model:</label>
               <select id="pgModel" class="glass-input px-3 py-1.5 rounded-xl text-xs text-white font-mono">
-                <option value="gemini-2.0-flash">gemini-2.0-flash (Google)</option>
-                <option value="gpt-4o-mini">gpt-4o-mini (OpenAI)</option>
-                <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet (Anthropic)</option>
-                <option value="openrouter/auto">openrouter/auto (Universal)</option>
-                <option value="anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter)</option>
-                <option value="deepseek/deepseek-r1">deepseek-r1 (OpenRouter)</option>
-                <option value="mistral-large-latest">mistral-large-latest (Mistral AI)</option>
-                <option value="grok-2-latest">grok-2-latest (xAI)</option>
-                <option value="sonar">sonar (Perplexity Search)</option>
-                <option value="command-r-plus-08-2024">command-r-plus (Cohere)</option>
-                <option value="llama-3.3-70b-versatile">llama-3.3-70b (Groq Cloud)</option>
-                <option value="deepseek-chat">deepseek-chat (DeepSeek)</option>
-                <option value="llama3.1">llama3.1 (Ollama Local)</option>
-                <option value="auto">auto (AI Hub Dynamic Route)</option>
+                <optgroup label="⚡ Smart Routing Intents">
+                  <option value="fastest">⚡ fastest (Groq Llama 3.3 / Low Latency)</option>
+                  <option value="cheapest">💰 cheapest (DeepSeek / Gemini Flash Cost-Saver)</option>
+                  <option value="smartest">🧠 smartest (GPT-4o / Claude 3.5 High Reasoning)</option>
+                  <option value="auto">🔄 auto (AI Hub Dynamic Failover)</option>
+                </optgroup>
+                <optgroup label="🌐 Multi-Provider Cloud Models">
+                  <option value="gemini-2.0-flash" selected>gemini-2.0-flash (Google)</option>
+                  <option value="gpt-4o-mini">gpt-4o-mini (OpenAI)</option>
+                  <option value="gpt-4o">gpt-4o (OpenAI Flagship)</option>
+                  <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet (Anthropic)</option>
+                  <option value="openrouter/auto">openrouter/auto (Universal)</option>
+                  <option value="anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter)</option>
+                  <option value="deepseek/deepseek-r1">deepseek-r1 (OpenRouter)</option>
+                  <option value="mistral-large-latest">mistral-large-latest (Mistral AI)</option>
+                  <option value="grok-2-latest">grok-2-latest (xAI)</option>
+                  <option value="sonar">sonar (Perplexity Search)</option>
+                  <option value="command-r-plus-08-2024">command-r-plus (Cohere)</option>
+                  <option value="llama-3.3-70b-versatile">llama-3.3-70b (Groq Cloud)</option>
+                  <option value="deepseek-chat">deepseek-chat (DeepSeek)</option>
+                  <option value="llama3.1">llama3.1 (Ollama Local)</option>
+                </optgroup>
               </select>
             </div>
           </div>

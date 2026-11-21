@@ -172,3 +172,23 @@ function downloadLogsCsv() {
   window.open(url, "_blank");
   showToast("Downloading request logs CSV...", "info");
 }
+
+function downloadLogsJson() {
+  const url = `/api/logs/export-json?token=${encodeURIComponent(getAdminToken())}`;
+  window.open(url, "_blank");
+  showToast("Downloading request logs JSON...", "info");
+}
+
+async function clearAllLogs() {
+  if (!confirm("Apakah Anda yakin ingin menghapus seluruh log transaksi AI Hub?")) return;
+  try {
+    const res = await fetchApi("/api/logs", { method: "DELETE" });
+    if (!res.ok) throw new Error("Gagal membersihkan log");
+    showToast("Semua log transaksi berhasil dibersihkan!", "success");
+    rawLogsList = [];
+    filterAndRenderLogs();
+    if (typeof loadStats === "function") loadStats();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}

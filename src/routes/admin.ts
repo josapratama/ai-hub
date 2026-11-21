@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { db } from "../db.js";
-import { executeChatCompletion } from "../services/router.js";
+import { executeChatCompletion, MODEL_ALIASES } from "../services/router.js";
 import { callGemini } from "../services/gemini.js";
 import { callOpenAICompatible } from "../services/openai-compatible.js";
 import { callAnthropic } from "../services/anthropic.js";
@@ -208,6 +208,20 @@ adminRouter.get("/logs/export", (_req: Request, res: Response) => {
   res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", 'attachment; filename="ai-hub-logs.csv"');
   res.send(csvContent);
+});
+
+// GET /api/logs/export-json - JSON Export
+adminRouter.get("/logs/export-json", (_req: Request, res: Response) => {
+  const logs = db.listLogs(1000);
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="ai-hub-logs-${Date.now()}.json"`);
+  res.json(logs);
+});
+
+// DELETE /api/logs - Clear logs
+adminRouter.delete("/logs", (_req: Request, res: Response) => {
+  db.clearLogs();
+  res.json({ success: true, message: "Semua log transaksi berhasil dibersihkan." });
 });
 
 // GET /api/providers
@@ -583,4 +597,46 @@ adminRouter.post("/playground", async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(502).json({ error: err.message });
   }
+});
+
+// GET /api/aliases - List system and custom aliases
+adminRouter.get("/aliases", (_req: Request, res: Response) => {
+  const settings = db.getSettings();
+  res.json({
+    systemAliases: MODEL_ALIASES,
+    customAliases: settings.customAliases || {},
+    smartIntents: {
+      fastest: "Groq Llama 3.3 70B (Sub-detik) atau Gemini 2.0 Flash",
+      cheapest: "DeepSeek Chat ($0.00014) atau Gemini 2.0 Flash",
+      smartest: "OpenAI GPT-4o atau Anthropic Claude 3.5 Sonnet",
+      auto: "Default Model pilihan Anda dengan failover cerdas",
+    },
+  });
+});
+
+// POST /api/aliases - Set or update a custom model alias
+adminRouter.post("/aliases", (req: Request, res: Response) => {
+  const { alias, targetModel } = req.body;
+  if (!alias || !targetModel) {
+    return res.status(400).json({ error: "Alias dan Target Model wajib diisi." });
+  }
+  const cleanAlias = alias.trim().toLowerCase();
+  const cleanTarget = targetModel.trim();
+  const settings = db.getSettings();
+  const customAliases = { ...(settings.customAliases || {}) };
+  customAliases[cleanAlias] = cleanTarget;
+  db.updateSettings({ customAliases });
+  res.json({ success: true, customAliases });
+});
+
+// DELETE /api/aliases/:alias - Delete custom model alias
+adminRouter.delete("/aliases/:alias", (req: Request, res: Response) => {
+  const cleanAlias = (req.params.alias || "").trim().toLowerCase();
+  const settings = db.getSettings();
+  const customAliases = { ...(settings.customAliases || {}) };
+  if (customAliases[cleanAlias]) {
+    delete customAliases[cleanAlias];
+    db.updateSettings({ customAliases });
+  }
+  res.json({ success: true, customAliases });
 });

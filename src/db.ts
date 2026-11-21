@@ -339,9 +339,16 @@ class Database extends EventEmitter {
 
   private saveDirect(data: DatabaseStore) {
     try {
-      fs.writeFileSync(storePath, JSON.stringify(data, null, 2), "utf8");
+      const tmpPath = `${storePath}.tmp.${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), "utf8");
+      fs.renameSync(tmpPath, storePath);
     } catch (err) {
-      console.error("[Database] Failed to save store.json:", err);
+      console.warn("[Database] Atomic save fallback to direct write:", err);
+      try {
+        fs.writeFileSync(storePath, JSON.stringify(data, null, 2), "utf8");
+      } catch (inner) {
+        console.error("[Database] Critical write failure:", inner);
+      }
     }
   }
 
@@ -462,6 +469,11 @@ class Database extends EventEmitter {
     return this.store.logs.slice(0, limit);
   }
 
+  public clearLogs(): void {
+    this.store.logs = [];
+    this.save();
+  }
+
   // --- Prompt Preset Methods ---
   public listPromptPresets(): PromptPreset[] {
     return this.store.promptPresets || [];
@@ -504,31 +516,52 @@ class Database extends EventEmitter {
   }
 
   public async syncOllamaModels(baseUrl?: string): Promise<string[]> {
-    const targetUrl = (baseUrl || this.store.providerConfigs.ollama?.baseUrl || "http://localhost:11434").replace(/\/+$/, "");
-    try {
-      const res = await fetch(`${targetUrl}/api/tags`);
-      if (!res.ok) throw new Error(`Ollama responded with status ${res.status}`);
-      const data = (await res.json()) as any;
-      const models = (data.models || []).map((m: any) => m.name || m.model).filter(Boolean);
-      if (models.length > 0) {
-        if (!this.store.providerConfigs.ollama) {
-          this.store.providerConfigs.ollama = {
-            id: "ollama",
-            name: "Ollama (Self-Hosted / Local)",
-            baseUrl: targetUrl,
-            isEnabled: true,
-            isAvailable: true,
-            models: [],
-          };
+    const urlsToTry: string[] = [];
+    if (baseUrl) urlsToTry.push(baseUrl.replace(/\/+$/, ""));
+    const configuredUrl = this.store.providerConfigs.ollama?.baseUrl;
+    if (configuredUrl) urlsToTry.push(configuredUrl.replace(/\/+$/, ""));
+    urlsToTry.push("http://localhost:11434");
+    urlsToTry.push("http://host.docker.internal:11434");
+    urlsToTry.push("http://172.17.0.1:11434");
+    urlsToTry.push("http://192.168.100.184:11434");
+
+    const uniqueUrls = Array.from(new Set(urlsToTry));
+    let lastError: any = null;
+
+    for (const targetUrl of uniqueUrls) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2500);
+        const res = await fetch(`${targetUrl}/api/tags`, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (!res.ok) continue;
+
+        const data = (await res.json()) as any;
+        const models = (data.models || []).map((m: any) => m.name || m.model).filter(Boolean);
+        if (models.length > 0) {
+          if (!this.store.providerConfigs.ollama) {
+            this.store.providerConfigs.ollama = {
+              id: "ollama",
+              name: "Ollama (Self-Hosted / Local)",
+              baseUrl: targetUrl,
+              isEnabled: true,
+              isAvailable: true,
+              models: [],
+            };
+          }
+          this.store.providerConfigs.ollama.baseUrl = targetUrl;
+          this.store.providerConfigs.ollama.models = Array.from(new Set([...this.store.providerConfigs.ollama.models, ...models]));
+          this.store.providerConfigs.ollama.isAvailable = true;
+          this.save();
+          return this.store.providerConfigs.ollama.models;
         }
-        this.store.providerConfigs.ollama.models = Array.from(new Set([...this.store.providerConfigs.ollama.models, ...models]));
-        this.store.providerConfigs.ollama.isAvailable = true;
-        this.save();
-        return this.store.providerConfigs.ollama.models;
+      } catch (err: any) {
+        lastError = err;
       }
-    } catch (err: any) {
-      console.warn("[Database] Failed to auto-sync Ollama models:", err.message);
-      throw err;
+    }
+
+    if (lastError) {
+      console.warn("[Database] Failed to auto-sync Ollama models across candidate URLs:", lastError.message);
     }
     return this.store.providerConfigs.ollama?.models || [];
   }
@@ -559,6 +592,25 @@ class Database extends EventEmitter {
     const last24h = now - 24 * 60 * 60 * 1000;
     const requests24h = this.store.logs.filter(l => new Date(l.createdAt).getTime() > last24h).length;
 
+    // Daily history for the last 7 days for visual analytics
+    const dailyHistory: { date: string; label: string; requests: number; tokens: number; costUsd: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now - i * 24 * 60 * 60 * 1000);
+      const dateStr = d.toISOString().split("T")[0];
+      const dayLabel = d.toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" });
+      const dayLogs = this.store.logs.filter(l => l.createdAt.startsWith(dateStr));
+      const reqCount = dayLogs.length;
+      const tokCount = dayLogs.reduce((acc, l) => acc + (l.promptTokens + l.completionTokens), 0);
+      const costCount = Number(dayLogs.reduce((acc, l) => acc + (l.costUsd || 0), 0).toFixed(4));
+      dailyHistory.push({
+        date: dateStr,
+        label: dayLabel,
+        requests: reqCount,
+        tokens: tokCount,
+        costUsd: costCount,
+      });
+    }
+
     return {
       totalRequests,
       totalTokens,
@@ -567,6 +619,7 @@ class Database extends EventEmitter {
       failedRequests,
       activeKeysCount,
       requests24h,
+      dailyHistory,
     };
   }
 }
