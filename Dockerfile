@@ -2,10 +2,10 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm install --frozen-lockfile
 
 COPY tsconfig.json ./
 COPY src ./src
@@ -20,8 +20,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=4000
 
-COPY package.json ./
-RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install --prod
+COPY package.json pnpm-lock.yaml* ./
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm install --prod
 
 COPY --from=builder /app/dist ./dist
 RUN mkdir -p /app/data
