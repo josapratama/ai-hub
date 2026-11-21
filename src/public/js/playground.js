@@ -11,6 +11,55 @@ function getPlaygroundKey() {
   return "aih_live_nexuschat_2026";
 }
 
+async function loadPlaygroundModels() {
+  const select = document.getElementById("pgModel");
+  if (!select) return;
+
+  try {
+    const res = await fetchApi("/api/providers");
+    if (!res.ok) return;
+    const providers = await res.json();
+
+    const currentVal = select.value || "gemini-3-flash-preview";
+    let html = `
+      <optgroup label="⚡ Smart Routing Intents">
+        <option value="auto">🔄 auto (AI Hub Dynamic Failover)</option>
+        <option value="fastest">⚡ fastest (Groq / Sub-detik)</option>
+        <option value="cheapest">💰 cheapest (DeepSeek / Gemini Cost-Saver)</option>
+        <option value="smartest">🧠 smartest (GPT-4o / Claude 3.5)</option>
+      </optgroup>
+    `;
+
+    const activeGroups = [];
+    const inactiveGroups = [];
+
+    for (const [pId, pConf] of Object.entries(providers)) {
+      if (!pConf.models || pConf.models.length === 0) continue;
+      const isConfigured = Boolean(pConf.apiKey || pId === "ollama");
+      const icon = isConfigured ? "🟢" : "⚪";
+      const statusLabel = isConfigured ? "Active" : "Not Configured";
+
+      const optGroupHtml = `
+        <optgroup label="${icon} ${pConf.name} (${statusLabel})">
+          ${pConf.models.map(m => `<option value="${m}">${m}${isConfigured ? ' ★' : ''}</option>`).join("")}
+        </optgroup>
+      `;
+
+      if (isConfigured) {
+        activeGroups.push(optGroupHtml);
+      } else {
+        inactiveGroups.push(optGroupHtml);
+      }
+    }
+
+    html += activeGroups.join("") + inactiveGroups.join("");
+    select.innerHTML = html;
+    if (currentVal) select.value = currentVal;
+  } catch (err) {
+    console.warn("Could not load dynamic models list:", err);
+  }
+}
+
 async function loadPromptPresets() {
   try {
     const res = await fetchApi("/api/prompt-presets");

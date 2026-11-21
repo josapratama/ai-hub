@@ -5,6 +5,7 @@ import { callGemini } from "../services/gemini.js";
 import { callOpenAICompatible } from "../services/openai-compatible.js";
 import { callAnthropic } from "../services/anthropic.js";
 import { getRotatedKey } from "../services/pricing.js";
+import { getCacheMetrics, clearCache } from "../services/cache.js";
 
 export const adminRouter = Router();
 
@@ -674,3 +675,79 @@ adminRouter.delete("/aliases/:alias", (req: Request, res: Response) => {
   }
   res.json({ success: true, customAliases });
 });
+
+// GET /api/logs/stream - Server-Sent Events (SSE) for Real-time Log Streaming
+adminRouter.get("/logs/stream", (req: Request, res: Response) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders();
+
+  res.write(`event: connected\ndata: ${JSON.stringify({ status: "connected", time: Date.now() })}\n\n`);
+
+  const onNewLog = (log: any) => {
+    try {
+      res.write(`data: ${JSON.stringify(log)}\n\n`);
+    } catch {
+      // client disconnected
+    }
+  };
+
+  db.on("newLog", onNewLog);
+
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(`: ping ${Date.now()}\n\n`);
+    } catch {
+      clearInterval(heartbeat);
+    }
+  }, 15000);
+
+  req.on("close", () => {
+    clearInterval(heartbeat);
+    db.off("newLog", onNewLog);
+    res.end();
+  });
+});
+
+// GET /api/cache/stats - Get smart prompt cache metrics
+adminRouter.get("/cache/stats", (_req: Request, res: Response) => {
+  res.json({ success: true, ...getCacheMetrics() });
+});
+
+// POST /api/cache/clear - Clear response cache
+adminRouter.post("/cache/clear", (_req: Request, res: Response) => {
+  const result = clearCache();
+  res.json({ success: true, ...result });
+});
+
+// GET /api/backup - Full hub configuration export
+adminRouter.get("/backup", (_req: Request, res: Response) => {
+  const backupData = db.backupStore();
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  res.setHeader("Content-Disposition", `attachment; filename="aihub-backup-${timestamp}.json"`);
+  res.setHeader("Content-Type", "application/json");
+  res.json({
+    app: "ai-hub",
+    version: "2026.1",
+    exportedAt: new Date().toISOString(),
+    store: backupData,
+  });
+});
+
+// POST /api/restore - Full hub configuration import & restore
+adminRouter.post("/restore", (req: Request, res: Response) => {
+  const { store } = req.body;
+  if (!store || !store.apiKeys || !store.providerConfigs) {
+    return res.status(400).json({ error: "Invalid backup format. Missing apiKeys or providerConfigs." });
+  }
+
+  try {
+    db.restoreStore(store);
+    res.json({ success: true, message: "Configuration successfully restored!" });
+  } catch (err: any) {
+    res.status(500).json({ error: `Restore failed: ${err.message}` });
+  }
+});
+

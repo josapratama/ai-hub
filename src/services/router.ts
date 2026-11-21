@@ -538,7 +538,7 @@ export async function executeChatCompletion(
     // If buffered response, save to cache and record log immediately
     if (result.response) {
       if (cacheKey) {
-        setCachedResponse(cacheKey, result.response, 600);
+        setCachedResponse(cacheKey, result.response, 600, result.response.usage?.total_tokens || 0, result.costUsd);
       }
       const respPreview = result.response.choices?.[0]?.message?.content ? String(result.response.choices[0].message.content).slice(0, 300) : "";
       db.addLog({
@@ -564,23 +564,54 @@ export async function executeChatCompletion(
   } catch (primaryErr: any) {
     console.warn(`[AI Hub] Primary provider (${primaryProvider}/${targetModel}) failed: ${primaryErr.message}`);
 
-    // If fallback is available and different, attempt fallback
+    // Build cascading failover chain of alternate models & providers
+    const triedModels = new Set<string>([targetModel]);
+    const fallbackQueue: { provider: ProviderId; model: string }[] = [];
+
     if (fallbackModel !== targetModel) {
+      fallbackQueue.push({ provider: fallbackProvider, model: fallbackModel });
+      triedModels.add(fallbackModel);
+    }
+
+    const configs = db.getProviders();
+    const candidateFallbacks: { provider: ProviderId; model: string }[] = [
+      { provider: "gemini", model: "gemini-3-flash-preview" },
+      { provider: "openai", model: "gpt-4o-mini" },
+      { provider: "groq", model: "llama-3.3-70b-versatile" },
+      { provider: "deepseek", model: "deepseek-chat" },
+      { provider: "ollama", model: "llama3.1" },
+    ];
+
+    for (const c of candidateFallbacks) {
+      if (!triedModels.has(c.model)) {
+        const provConfig = configs[c.provider];
+        if (provConfig && provConfig.isEnabled && (provConfig.apiKey || c.provider === "ollama")) {
+          fallbackQueue.push(c);
+          triedModels.add(c.model);
+        }
+      }
+    }
+
+    const errors: string[] = [`Primary (${targetModel}): ${primaryErr.message}`];
+
+    for (const attempt of fallbackQueue) {
       try {
-        console.info(`[AI Hub] Attempting automatic failover to fallback (${fallbackProvider}/${fallbackModel})...`);
-        const fallbackResult = await runProvider(fallbackProvider, fallbackModel, request, true);
+        console.info(`[AI Hub] Cascading failover trying (${attempt.provider}/${attempt.model})...`);
+        const fallbackResult = await runProvider(attempt.provider, attempt.model, request, true);
 
         if (fallbackResult.response) {
           if (cacheKey) {
-            setCachedResponse(cacheKey, fallbackResult.response, 600);
+            setCachedResponse(cacheKey, fallbackResult.response, 600, fallbackResult.response.usage?.total_tokens || 0, fallbackResult.costUsd);
           }
-          const respPreview = fallbackResult.response.choices?.[0]?.message?.content ? String(fallbackResult.response.choices[0].message.content).slice(0, 300) : "";
+          const respPreview = fallbackResult.response.choices?.[0]?.message?.content
+            ? String(fallbackResult.response.choices[0].message.content).slice(0, 300)
+            : "";
           db.addLog({
             apiKeyId,
             project: projectName,
             modelRequested: rawRequest.model,
             modelUsed: fallbackResult.modelUsed,
-            providerUsed: `${fallbackResult.providerUsed} (fallback)`,
+            providerUsed: `${fallbackResult.providerUsed} (cascade-fallback)`,
             promptTokens: fallbackResult.response.usage?.prompt_tokens || 0,
             completionTokens: fallbackResult.response.usage?.completion_tokens || 0,
             durationMs: fallbackResult.durationMs,
@@ -595,37 +626,24 @@ export async function executeChatCompletion(
         }
 
         sendWebhookAlert(
-          "Automatic Failover Triggered",
-          `Primary provider (${primaryProvider}/${targetModel}) failed (${primaryErr.message}). Successfully failed over to ${fallbackProvider}/${fallbackModel} for project '${projectName}'.`,
+          "Cascading Failover Succeeded",
+          `Primary provider (${primaryProvider}/${targetModel}) failed. Successfully failed over to (${attempt.provider}/${attempt.model}) for project '${projectName}'.`,
           "warning"
         );
         return fallbackResult;
-      } catch (fallbackErr: any) {
-        // Fallback also failed
-        sendWebhookAlert(
-          "All AI Providers Failed",
-          `Project '${projectName}' request failed on primary (${targetModel}) and fallback (${fallbackModel}). Primary: ${primaryErr.message} | Fallback: ${fallbackErr.message}`,
-          "error"
-        );
-        db.addLog({
-          apiKeyId,
-          project: projectName,
-          modelRequested: rawRequest.model,
-          modelUsed: targetModel,
-          providerUsed: primaryProvider,
-          promptTokens: 0,
-          completionTokens: 0,
-          durationMs: Date.now() - startTime,
-          costUsd: 0,
-          status: "error",
-          errorMessage: `Primary error: ${primaryErr.message}; Fallback error: ${fallbackErr.message}`,
-          promptPreview,
-        });
-        throw new Error(`All providers failed. Primary: ${primaryErr.message} | Fallback: ${fallbackErr.message}`);
+      } catch (err: any) {
+        console.warn(`[AI Hub] Cascade fallback (${attempt.provider}/${attempt.model}) failed: ${err.message}`);
+        errors.push(`${attempt.provider}/${attempt.model}: ${err.message}`);
       }
     }
 
-    // Record failure in DB
+    // All failovers failed
+    const combinedError = errors.join(" | ");
+    sendWebhookAlert(
+      "All AI Providers Failed in Cascade",
+      `Project '${projectName}' request failed across all cascade providers: ${combinedError}`,
+      "error"
+    );
     db.addLog({
       apiKeyId,
       project: projectName,
@@ -637,10 +655,9 @@ export async function executeChatCompletion(
       durationMs: Date.now() - startTime,
       costUsd: 0,
       status: "error",
-      errorMessage: primaryErr.message,
+      errorMessage: combinedError,
       promptPreview,
     });
-
-    throw primaryErr;
+    throw new Error(`All providers failed: ${combinedError}`);
   }
 }

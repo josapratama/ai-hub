@@ -11,9 +11,36 @@ let autoSpeakAgent = false;
 async function initAgentsTab() {
   await loadAvailableScopes();
   await selectScope(activeScopeId);
+  loadAgentModelOptions();
   loadAgentAnalytics();
   loadCronJobs();
   loadAgentMemories();
+}
+
+async function loadAgentModelOptions() {
+  const select = document.getElementById("agentModelSelect");
+  if (!select) return;
+
+  try {
+    const res = await apiRequest("/api/providers");
+    if (!res) return;
+
+    const current = select.value || "gemini-3-flash-preview";
+    let html = `<option value="">Auto Router (Default Hub)</option>`;
+
+    for (const [pId, pConf] of Object.entries(res)) {
+      if (!pConf.models || pConf.models.length === 0) continue;
+      const isConfigured = Boolean(pConf.apiKey || pId === "ollama");
+      const icon = isConfigured ? "🟢" : "⚪";
+      html += `<optgroup label="${icon} ${pConf.name} (${isConfigured ? 'Active' : 'Unconfigured'})">`;
+      for (const m of pConf.models) {
+        html += `<option value="${m}">${m}${isConfigured ? ' ★' : ''}</option>`;
+      }
+      html += `</optgroup>`;
+    }
+    select.innerHTML = html;
+    if (current) select.value = current;
+  } catch {}
 }
 
 // Load scopes list from /api/agents/projects
@@ -159,19 +186,30 @@ function renderAgentChat() {
     // Render tool execution card if message has tool calls
     let toolsHtml = "";
     if (m.toolCalls && m.toolCalls.length > 0) {
-      toolsHtml = m.toolCalls.map(tc => `
-        <div class="tool-exec-card p-3 rounded-xl mb-3 text-xs">
-          <div class="flex items-center justify-between text-indigo-300 font-mono font-semibold mb-1">
+      toolsHtml = m.toolCalls.map((tc, idx) => `
+        <div class="tool-exec-card p-3 rounded-xl mb-2.5 text-xs border border-indigo-500/20 bg-surface-900/80 shadow-inner">
+          <div class="flex items-center justify-between text-indigo-300 font-mono font-semibold mb-1.5 flex-wrap gap-1">
             <span class="flex items-center gap-1.5">
-              <i data-lucide="cpu" class="w-3.5 h-3.5 text-amber-400"></i>
-              Tool Executed: <strong>${tc.toolName}</strong>
+              <span class="w-4 h-4 rounded-full bg-amber-400/20 text-amber-400 text-[10px] flex items-center justify-center font-bold font-sans">${idx + 1}</span>
+              <i data-lucide="cpu" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+              <span>Tool Call: <strong class="text-white">${tc.toolName}</strong></span>
             </span>
-            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/60 font-sans">Success</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/60 font-sans font-bold">Executed</span>
           </div>
+          ${tc.arguments ? `
+            <details class="mt-1 text-[11px] group">
+              <summary class="cursor-pointer text-indigo-300 hover:text-indigo-200 select-none font-mono text-[10px] flex items-center gap-1">
+                <span>▶ Input Arguments</span>
+              </summary>
+              <pre class="mt-1 p-2 bg-black/70 rounded-lg text-amber-300 font-mono text-[10px] overflow-x-auto border border-white/5">${escapeHtml(typeof tc.arguments === "string" ? tc.arguments : JSON.stringify(tc.arguments, null, 2))}</pre>
+            </details>
+          ` : ""}
           ${tc.result ? `
-            <details class="mt-1.5 text-[11px]">
-              <summary class="cursor-pointer text-gray-400 hover:text-gray-200 select-none">View Tool Output JSON</summary>
-              <pre class="mt-1 p-2 bg-black/60 rounded text-gray-300 font-mono text-[10px] overflow-x-auto">${escapeHtml(JSON.stringify(tc.result, null, 2))}</pre>
+            <details class="mt-1 text-[11px] group" open>
+              <summary class="cursor-pointer text-emerald-400 hover:text-emerald-300 select-none font-mono text-[10px] flex items-center gap-1">
+                <span>▼ Output Result</span>
+              </summary>
+              <pre class="mt-1 p-2 bg-black/70 rounded-lg text-emerald-300 font-mono text-[10px] overflow-x-auto border border-white/5">${escapeHtml(typeof tc.result === "string" ? tc.result : JSON.stringify(tc.result, null, 2))}</pre>
             </details>
           ` : ""}
         </div>

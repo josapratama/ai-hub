@@ -55,6 +55,7 @@ async function loadStats() {
 
     // Load System Telemetry
     loadSystemHealth();
+    loadCacheStats();
 
     // Also load recent logs
     if (typeof loadLogs === "function") {
@@ -118,6 +119,112 @@ function renderAnalyticsChart(dailyHistory = []) {
     `;
   }).join("");
 }
+
+// Realtime KPI incremental update on SSE new log
+window.addEventListener("newLogReceived", (e) => {
+  const log = e.detail;
+  if (!log) return;
+
+  const elReq = document.getElementById("statTotalRequests");
+  if (elReq) {
+    const cur = parseInt(elReq.textContent.replace(/,/g, "") || "0", 10);
+    elReq.textContent = (cur + 1).toLocaleString();
+  }
+
+  const elTok = document.getElementById("statTotalTokens");
+  if (elTok) {
+    const cur = parseInt(elTok.textContent.replace(/,/g, "") || "0", 10);
+    const added = (log.promptTokens || 0) + (log.completionTokens || 0);
+    elTok.textContent = (cur + added).toLocaleString();
+  }
+
+  const elCost = document.getElementById("statTotalCost");
+  if (elCost) {
+    const cur = parseFloat(elCost.textContent.replace("$", "") || "0");
+    elCost.textContent = `$${(cur + (log.costUsd || 0)).toFixed(4)}`;
+  }
+});
+
+// Cache Metrics
+async function loadCacheStats() {
+  try {
+    const res = await fetchApi("/api/cache/stats");
+    if (!res.ok) return;
+    const data = await res.json();
+    const elRatio = document.getElementById("cacheHitRatio");
+    const elSaved = document.getElementById("cacheTokensSaved");
+    const elCost = document.getElementById("cacheCostSaved");
+    const elEntries = document.getElementById("cacheEntriesCount");
+
+    if (elRatio) elRatio.textContent = `${data.hitRatio}%`;
+    if (elSaved) elSaved.textContent = (data.tokensSaved || 0).toLocaleString();
+    if (elCost) elCost.textContent = `$${(data.costSavedUsd || 0).toFixed(4)}`;
+    if (elEntries) elEntries.textContent = `${data.size || 0} entries`;
+  } catch {}
+}
+
+async function clearPromptCache() {
+  if (!confirm("Hapus seluruh in-memory response cache sekarang?")) return;
+  try {
+    const res = await fetchApi("/api/cache/clear", { method: "POST" });
+    const data = await res.json();
+    showToast(`Smart cache dibersihkan (${data.clearedEntries || 0} entri dihapus)`, "success");
+    loadCacheStats();
+  } catch (err) {
+    showToast(`Gagal membersihkan cache: ${err.message}`, "error");
+  }
+}
+
+// 1-Click Backup Export
+function exportHubBackup() {
+  const token = getAdminToken();
+  window.open(`/api/backup?token=${encodeURIComponent(token)}`, "_blank");
+  showToast("Mengunduh backup konfigurasi AI Hub...", "success");
+}
+
+// 1-Click Restore Import
+async function triggerHubRestore(inputEl) {
+  const file = inputEl.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const payload = JSON.parse(e.target.result);
+      const storeData = payload.store || payload;
+      if (!storeData.apiKeys || !storeData.providerConfigs) {
+        throw new Error("File backup tidak valid atau rusak.");
+      }
+
+      if (!confirm("PERINGATAN: Memulihkan konfigurasi akan menimpa seluruh API Keys dan Provider saat ini. Lanjutkan?")) {
+        inputEl.value = "";
+        return;
+      }
+
+      const res = await fetchApi("/api/restore", {
+        method: "POST",
+        body: JSON.stringify({ store: storeData }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Gagal restore");
+
+      showToast("Konfigurasi AI Hub berhasil dipulihkan secara penuh!", "success");
+      setTimeout(() => location.reload(), 1200);
+    } catch (err) {
+      showToast(`Restore gagal: ${err.message}`, "error");
+    } finally {
+      inputEl.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Expose globally
+window.loadCacheStats = loadCacheStats;
+window.clearPromptCache = clearPromptCache;
+window.exportHubBackup = exportHubBackup;
+window.triggerHubRestore = triggerHubRestore;
 
 // Re-render chart on language change
 window.addEventListener("languageChanged", () => {

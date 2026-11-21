@@ -43,7 +43,10 @@ function switchTab(tab) {
     if (typeof loadAliases === "function") loadAliases();
   }
   if (tab === "playground") {
-    if (typeof loadPromptPresets === "function") loadPromptPresets();
+    if (typeof loadPromptPresets === "function") {
+      loadPromptPresets();
+      if (typeof loadPlaygroundModels === "function") loadPlaygroundModels();
+    }
     if (typeof updatePlaygroundCostEstimate === "function") updatePlaygroundCostEstimate();
   }
 }
@@ -62,7 +65,10 @@ function refreshAll() {
   if (typeof loadStats === "function") loadStats();
   if (typeof loadKeys === "function") loadKeys();
   if (typeof loadProviders === "function") loadProviders();
-  if (typeof loadPromptPresets === "function") loadPromptPresets();
+  if (typeof loadPromptPresets === "function") {
+    loadPromptPresets();
+    if (typeof loadPlaygroundModels === "function") loadPlaygroundModels();
+  }
   if (typeof loadAvailableScopes === "function") loadAvailableScopes();
   if (typeof loadAgentAnalytics === "function") loadAgentAnalytics();
   showToast("Dashboard metrics refreshed", "info", 1800);

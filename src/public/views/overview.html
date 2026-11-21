@@ -50,6 +50,48 @@
     </div>
   </div>
 
+  <!-- Smart Prompt Cache & Backup Bar -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 w-full min-w-0">
+    <!-- Smart Cache Widget -->
+    <div class="lg:col-span-2 px-3.5 sm:px-5 py-3 rounded-xl sm:rounded-2xl glass-panel border border-surface-700/60 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold shrink-0">⚡</div>
+        <div class="min-w-0">
+          <div class="font-bold text-white text-xs sm:text-sm flex items-center gap-2">
+            <span>Smart Prompt Caching</span>
+            <span id="cacheEntriesCount" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">0 entries</span>
+          </div>
+          <div class="text-[10px] sm:text-[11px] text-gray-400">
+            Hit Ratio: <span id="cacheHitRatio" class="font-bold text-amber-300">0%</span> • Hemat: <span id="cacheTokensSaved" class="font-bold text-emerald-400">0</span> tokens (<span id="cacheCostSaved" class="text-emerald-300 font-bold">$0.0000</span>)
+          </div>
+        </div>
+      </div>
+      <button onclick="clearPromptCache()" class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-gray-300 hover:text-white text-[11px] font-semibold border border-surface-700 transition-all shrink-0 flex items-center gap-1.5 self-start sm:self-auto">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+        <span>Bersihkan Cache</span>
+      </button>
+    </div>
+
+    <!-- Backup & Restore Controls -->
+    <div class="px-3.5 sm:px-5 py-3 rounded-xl sm:rounded-2xl glass-panel border border-surface-700/60 shadow-sm flex items-center justify-between gap-2 text-xs">
+      <div class="min-w-0">
+        <div class="font-bold text-white text-xs truncate">Backup & Restore</div>
+        <div class="text-[10px] text-gray-400 truncate">Ekspor/impor konfigurasi</div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="exportHubBackup()" class="px-2.5 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-indigo-300 hover:text-white text-[11px] font-semibold border border-surface-700 transition-all flex items-center gap-1" title="Unduh File Backup JSON">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Backup</span>
+        </button>
+        <label class="px-2.5 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-emerald-300 hover:text-white text-[11px] font-semibold border border-surface-700 transition-all flex items-center gap-1 cursor-pointer" title="Pulihkan File Backup JSON">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+          <span>Restore</span>
+          <input type="file" accept=".json" class="hidden" onchange="triggerHubRestore(this)" />
+        </label>
+      </div>
+    </div>
+  </div>
+
   <!-- 7-Day Visual Analytics Trend Chart -->
   <div class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl glass-panel shadow-sm space-y-3 sm:space-y-4 border border-surface-700/60 w-full min-w-0">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">

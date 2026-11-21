@@ -100,6 +100,7 @@ export interface ApiKey {
   expiresAt?: string; // Optional expiry date ISO
   createdAt: string;
   lastUsedAt?: string;
+  alertThresholdSent?: number; // 80 or 100 to prevent duplicate alerts
 }
 
 export interface PromptPreset {

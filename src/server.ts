@@ -11,6 +11,20 @@ import { mcpRouter } from "./routes/mcp.js";
 import { webhooksRouter } from "./routes/webhooks.js";
 import { cronEngine } from "./agents/services/cron.js";
 import { db } from "./db.js";
+import { sendWebhookAlert } from "./services/webhook.js";
+
+// Listen for budget alerts and forward to configured webhooks
+db.on("budgetAlert", ({ key, threshold, pct }) => {
+  const isExceeded = threshold >= 100;
+  const severity = isExceeded ? "error" : "warning";
+  const title = isExceeded ? "🚨 Kuota Token Habis!" : "⚠️ Peringatan Kuota Token 80%";
+  const msg = isExceeded
+    ? `API Key "${key.name}" (${key.project}) telah mencapai ${pct}% dari limit bulanan (${key.currentMonthTokens?.toLocaleString()} / ${key.maxMonthlyTokens?.toLocaleString()} tokens). Request berikutnya dapat ditolak.`
+    : `API Key "${key.name}" (${key.project}) telah menggunakan ${pct}% dari kuota bulanan (${key.currentMonthTokens?.toLocaleString()} / ${key.maxMonthlyTokens?.toLocaleString()} tokens).`;
+  sendWebhookAlert(title, msg, severity).catch(err => {
+    console.warn("[AI Hub] Budget webhook alert error:", err.message);
+  });
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

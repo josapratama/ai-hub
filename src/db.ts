@@ -458,6 +458,7 @@ class Database extends EventEmitter {
         key.currentMonthTokens = 0;
         key.currentMonthCostUsd = 0;
         key.lastResetMonth = currentMonth;
+        key.alertThresholdSent = 0;
       }
       key.totalRequests += 1;
       key.totalTokens += tokens;
@@ -465,6 +466,19 @@ class Database extends EventEmitter {
       key.currentMonthTokens = (key.currentMonthTokens || 0) + tokens;
       key.currentMonthCostUsd = Number(((key.currentMonthCostUsd || 0) + costUsd).toFixed(6));
       key.lastUsedAt = new Date().toISOString();
+
+      // Check quota thresholds
+      if (key.maxMonthlyTokens && key.maxMonthlyTokens > 0) {
+        const pct = (key.currentMonthTokens / key.maxMonthlyTokens) * 100;
+        if (pct >= 100 && (key.alertThresholdSent || 0) < 100) {
+          key.alertThresholdSent = 100;
+          this.emit("budgetAlert", { key, threshold: 100, pct: Math.round(pct) });
+        } else if (pct >= 80 && (key.alertThresholdSent || 0) < 80) {
+          key.alertThresholdSent = 80;
+          this.emit("budgetAlert", { key, threshold: 80, pct: Math.round(pct) });
+        }
+      }
+
       this.save();
     }
   }

@@ -25,15 +25,29 @@ function toggleLiveLogStream() {
   logEventSource.onmessage = (e) => {
     try {
       const newLog = JSON.parse(e.data);
-      rawLogsList.unshift(newLog);
-      if (rawLogsList.length > 500) rawLogsList.pop();
-      filterAndRenderLogs();
+      if (newLog && newLog.id) {
+        rawLogsList.unshift(newLog);
+        if (rawLogsList.length > 500) rawLogsList.pop();
+        filterAndRenderLogs();
+        // Dispatch global event for live KPI counters
+        window.dispatchEvent(new CustomEvent("newLogReceived", { detail: newLog }));
+      }
     } catch { }
   };
   logEventSource.onerror = () => {
-    dot.className = "w-2 h-2 rounded-full bg-red-400";
+    dot.className = "w-2 h-2 rounded-full bg-amber-400";
     txt.textContent = "Stream Reconnecting...";
   };
+}
+
+// Auto-start live stream on dashboard load
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    if (!logEventSource) {
+      toggleLiveLogStream();
+    }
+  }, 1000);
+});
 }
 
 async function loadLogs() {
